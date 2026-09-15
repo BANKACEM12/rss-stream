@@ -154,5 +154,58 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: var(--font-sans);
+    background-image: radial-gradient(
+      oklch(0.19 0.012 60 / 3.5%) 1px,
+      transparent 1px
+    );
+    background-size: 22px 22px;
   }
+
+  h1,
+  h2,
+  h3,
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  [dir="rtl"] body {
+    font-family: var(--font-sans);
+  }
+}
+
+/* Thin double rule used across the masthead and section headers. */
+@utility rule-double {
+  border-top: 3px double var(--color-rule);
+}
+
+@utility kicker {
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--color-crimson);
+}
+
+@utility headline-link {
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 150ms ease;
+
+  &:hover {
+    text-decoration-color: var(--color-crimson);
+  }
+}
+
+@utility ad-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--color-rule);
+  background-color: oklch(0.95 0.012 82);
+  color: var(--color-muted-foreground);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
