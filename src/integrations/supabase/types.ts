@@ -65,6 +65,36 @@ export type Database = {
         }
         Relationships: []
       }
+      ingest_state: {
+        Row: {
+          cursor: number
+          id: string
+          inserted_total: number
+          last_error: string | null
+          last_run_at: string | null
+          lease_until: string | null
+          paused: boolean
+        }
+        Insert: {
+          cursor?: number
+          id?: string
+          inserted_total?: number
+          last_error?: string | null
+          last_run_at?: string | null
+          lease_until?: string | null
+          paused?: boolean
+        }
+        Update: {
+          cursor?: number
+          id?: string
+          inserted_total?: number
+          last_error?: string | null
+          last_run_at?: string | null
+          lease_until?: string | null
+          paused?: boolean
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
