@@ -19,6 +19,14 @@
  */
 
 @theme inline {
+  --font-display: "Playfair Display", "Noto Kufi Arabic", "Noto Serif SC", Georgia, serif;
+  --font-sans: "IBM Plex Sans Arabic", "IBM Plex Sans", "Noto Sans SC", system-ui, sans-serif;
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+  --color-crimson: var(--crimson);
+  --color-crimson-foreground: var(--crimson-foreground);
+  --color-gold: var(--gold);
+  --color-rule: var(--rule);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
