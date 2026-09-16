@@ -10,12 +10,30 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LangRouteRouteImport } from './routes/$lang/route'
+import { Route as LangIndexRouteImport } from './routes/$lang/index'
+import { Route as LangCategorySlugRouteImport } from './routes/$lang/category.$slug'
 import { Route as ApiPublicIngestRouteImport } from './routes/api/public/ingest'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const LangRouteRoute = LangRouteRouteImport.update({
+  id: '/$lang',
+  path: '/$lang',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LangIndexRoute = LangIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LangRouteRoute,
+} as any)
+const LangCategorySlugRoute = LangCategorySlugRouteImport.update({
+  id: '/category/$slug',
+  path: '/category/$slug',
+  getParentRoute: () => LangRouteRoute,
 } as any)
 const ApiPublicIngestRoute = ApiPublicIngestRouteImport.update({
   id: '/api/public/ingest',
@@ -25,27 +43,43 @@ const ApiPublicIngestRoute = ApiPublicIngestRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/$lang': typeof LangRouteRouteWithChildren
+  '/$lang/': typeof LangIndexRoute
+  '/$lang/category/$slug': typeof LangCategorySlugRoute
   '/api/public/ingest': typeof ApiPublicIngestRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/$lang': typeof LangIndexRoute
+  '/$lang/category/$slug': typeof LangCategorySlugRoute
   '/api/public/ingest': typeof ApiPublicIngestRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/$lang': typeof LangRouteRouteWithChildren
+  '/$lang/': typeof LangIndexRoute
+  '/$lang/category/$slug': typeof LangCategorySlugRoute
   '/api/public/ingest': typeof ApiPublicIngestRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/public/ingest'
+  fullPaths:
+    '/' | '/$lang' | '/$lang/' | '/$lang/category/$slug' | '/api/public/ingest'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/public/ingest'
-  id: '__root__' | '/' | '/api/public/ingest'
+  to: '/' | '/$lang' | '/$lang/category/$slug' | '/api/public/ingest'
+  id:
+    | '__root__'
+    | '/'
+    | '/$lang'
+    | '/$lang/'
+    | '/$lang/category/$slug'
+    | '/api/public/ingest'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LangRouteRoute: typeof LangRouteRouteWithChildren
   ApiPublicIngestRoute: typeof ApiPublicIngestRoute
 }
 
@@ -58,6 +92,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$lang': {
+      id: '/$lang'
+      path: '/$lang'
+      fullPath: '/$lang'
+      preLoaderRoute: typeof LangRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/': {
+      id: '/$lang/'
+      path: '/'
+      fullPath: '/$lang/'
+      preLoaderRoute: typeof LangIndexRouteImport
+      parentRoute: typeof LangRouteRoute
+    }
+    '/$lang/category/$slug': {
+      id: '/$lang/category/$slug'
+      path: '/category/$slug'
+      fullPath: '/$lang/category/$slug'
+      preLoaderRoute: typeof LangCategorySlugRouteImport
+      parentRoute: typeof LangRouteRoute
+    }
     '/api/public/ingest': {
       id: '/api/public/ingest'
       path: '/api/public/ingest'
@@ -68,8 +123,23 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface LangRouteRouteChildren {
+  LangIndexRoute: typeof LangIndexRoute
+  LangCategorySlugRoute: typeof LangCategorySlugRoute
+}
+
+const LangRouteRouteChildren: LangRouteRouteChildren = {
+  LangIndexRoute: LangIndexRoute,
+  LangCategorySlugRoute: LangCategorySlugRoute,
+}
+
+const LangRouteRouteWithChildren = LangRouteRoute._addFileChildren(
+  LangRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LangRouteRoute: LangRouteRouteWithChildren,
   ApiPublicIngestRoute: ApiPublicIngestRoute,
 }
 export const routeTree = rootRouteImport
