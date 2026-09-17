@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 
+import { authenticateCronRequest } from "@/integrations/supabase/cron-auth";
 import { FEEDS } from "@/lib/sources";
 import { parseFeed, toIso } from "@/lib/rss.server";
 import { excerpt, extractKeywords, slugify } from "@/lib/keywords";
@@ -60,7 +61,11 @@ async function runIngest() {
   for (const feed of batch) {
     try {
       const response = await fetch(feed.url, {
-        headers: { "user-agent": "NewsPulseBot/1.0 (+aggregator; contact via site)" },
+        headers: {
+          "user-agent":
+            "Mozilla/5.0 (compatible; NewsPulseBot/1.0; +aggregator, headlines only)",
+          accept: "application/rss+xml, application/xml, text/xml;q=0.9, */*;q=0.8",
+        },
         signal: AbortSignal.timeout(12_000),
       });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -126,7 +131,24 @@ async function runIngest() {
   };
 }
 
-async function handle() {
+/** The scheduled database job authenticates with a token stored in ingest_state. */
+async function hasDbToken(request: Request): Promise<boolean> {
+  const match = /^Bearer ([^\s,]+)$/.exec(request.headers.get("authorization") ?? "");
+  const token = match?.[1];
+  if (!token) return false;
+  const { data } = await admin()
+    .from("ingest_state")
+    .select("cron_token")
+    .eq("id", "singleton")
+    .maybeSingle();
+  return Boolean(data?.cron_token) && data!.cron_token === token;
+}
+
+async function handle({ request }: { request: Request }) {
+  if (!(await hasDbToken(request))) {
+    const unauthorized = await authenticateCronRequest(request);
+    if (unauthorized) return unauthorized;
+  }
   try {
     const result = await runIngest();
     return new Response(JSON.stringify({ ok: true, ...result }), {

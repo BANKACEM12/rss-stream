@@ -1,0 +1,1 @@
+ALTER TABLE public.ingest_state ADD COLUMN IF NOT EXISTS cron_token uuid NOT NULL DEFAULT gen_random_uuid();
