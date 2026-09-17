@@ -67,6 +67,7 @@ export type Database = {
       }
       ingest_state: {
         Row: {
+          cron_token: string
           cursor: number
           id: string
           inserted_total: number
@@ -76,6 +77,7 @@ export type Database = {
           paused: boolean
         }
         Insert: {
+          cron_token?: string
           cursor?: number
           id?: string
           inserted_total?: number
@@ -85,6 +87,7 @@ export type Database = {
           paused?: boolean
         }
         Update: {
+          cron_token?: string
           cursor?: number
           id?: string
           inserted_total?: number
