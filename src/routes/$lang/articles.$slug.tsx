@@ -77,7 +77,28 @@ export const Route = createFileRoute("/$lang/articles/$slug")({
             isBasedOn: article.link,
             publisher: { "@type": "Organization", name: article.source_name },
             author: { "@type": "Organization", name: article.source_name },
+            dateModified: article.published_at,
+            articleSection: dict.categories[article.category as Category] ?? article.category,
+            ...(article.keywords?.length ? { keywords: article.keywords.join(", ") } : {}),
+            url: path,
             mainEntityOfPage: { "@type": "WebPage", "@id": path },
+          }),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: dict.siteName, item: `/${lang}` },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: dict.categories[article.category as Category] ?? article.category,
+                item: `/${lang}/category/${article.category}`,
+              },
+              { "@type": "ListItem", position: 3, name: article.title, item: path },
+            ],
           }),
         },
       ],
