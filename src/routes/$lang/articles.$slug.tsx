@@ -40,10 +40,21 @@ export const Route = createFileRoute("/$lang/articles/$slug")({
       meta: [
         { title: `${article.title} — ${dict.siteName}` },
         { name: "description", content: description },
+        ...(article.keywords?.length
+          ? [
+              { name: "keywords", content: article.keywords.join(", ") },
+              { name: "news_keywords", content: article.keywords.join(", ") },
+            ]
+          : []),
         { property: "og:title", content: article.title },
         { property: "og:description", content: description },
         { property: "og:type", content: "article" },
         { property: "og:url", content: path },
+        { property: "og:locale", content: lang === "zh" ? "zh_CN" : lang },
+        { property: "article:published_time", content: article.published_at },
+        { property: "article:section", content: dict.categories[article.category as Category] ?? article.category },
+        { name: "twitter:title", content: article.title },
+        { name: "twitter:description", content: description },
         ...(article.image_url
           ? [
               { property: "og:image", content: article.image_url },
