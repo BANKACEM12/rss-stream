@@ -105,6 +105,33 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "NewsMediaOrganization",
+              "@id": "/#organization",
+              name: "NewsPulse",
+              alternateName: "نبض الأخبار",
+              url: "/",
+              description:
+                "موقع تجميع أخبار يعرض عناوين ومقتطفات قصيرة مع رابط المصدر الأصلي بثلاث لغات.",
+            },
+            {
+              "@type": "WebSite",
+              "@id": "/#website",
+              name: "NewsPulse",
+              url: "/",
+              inLanguage: ["ar", "en", "zh"],
+              publisher: { "@id": "/#organization" },
+            },
+          ],
+        }),
+      },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,
