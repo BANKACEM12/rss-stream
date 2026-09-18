@@ -40,10 +40,21 @@ export const Route = createFileRoute("/$lang/articles/$slug")({
       meta: [
         { title: `${article.title} — ${dict.siteName}` },
         { name: "description", content: description },
+        ...(article.keywords?.length
+          ? [
+              { name: "keywords", content: article.keywords.join(", ") },
+              { name: "news_keywords", content: article.keywords.join(", ") },
+            ]
+          : []),
         { property: "og:title", content: article.title },
         { property: "og:description", content: description },
         { property: "og:type", content: "article" },
         { property: "og:url", content: path },
+        { property: "og:locale", content: lang === "zh" ? "zh_CN" : lang },
+        { property: "article:published_time", content: article.published_at },
+        { property: "article:section", content: dict.categories[article.category as Category] ?? article.category },
+        { name: "twitter:title", content: article.title },
+        { name: "twitter:description", content: description },
         ...(article.image_url
           ? [
               { property: "og:image", content: article.image_url },
@@ -66,7 +77,28 @@ export const Route = createFileRoute("/$lang/articles/$slug")({
             isBasedOn: article.link,
             publisher: { "@type": "Organization", name: article.source_name },
             author: { "@type": "Organization", name: article.source_name },
+            dateModified: article.published_at,
+            articleSection: dict.categories[article.category as Category] ?? article.category,
+            ...(article.keywords?.length ? { keywords: article.keywords.join(", ") } : {}),
+            url: path,
             mainEntityOfPage: { "@type": "WebPage", "@id": path },
+          }),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: dict.siteName, item: `/${lang}` },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: dict.categories[article.category as Category] ?? article.category,
+                item: `/${lang}/category/${article.category}`,
+              },
+              { "@type": "ListItem", position: 3, name: article.title, item: path },
+            ],
           }),
         },
       ],

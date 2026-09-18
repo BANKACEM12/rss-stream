@@ -51,6 +51,32 @@ export const Route = createFileRoute("/$lang/category/$slug")({
           hrefLang: code,
           href: `/${code}/category/${category}`,
         })),
+        { rel: "alternate", hrefLang: "x-default", href: `/en/category/${category}` },
+      ],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            name: dict.categories[category],
+            description,
+            inLanguage: lang,
+            url: `/${lang}/category/${category}`,
+            breadcrumb: {
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                { "@type": "ListItem", position: 1, name: dict.siteName, item: `/${lang}` },
+                {
+                  "@type": "ListItem",
+                  position: 2,
+                  name: dict.categories[category],
+                  item: `/${lang}/category/${category}`,
+                },
+              ],
+            },
+          }),
+        },
       ],
     };
   },
