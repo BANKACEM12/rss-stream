@@ -2,6 +2,7 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 
 import { AdSlot } from "@/components/news/AdSlot";
+import { EditorialImage } from "@/components/news/EditorialImage";
 import { GlobalScoreBox } from "@/components/news/GlobalScoreBox";
 import { RelatedStories } from "@/components/news/RelatedStories";
 import { getArticle } from "@/lib/news.functions";
@@ -133,11 +134,12 @@ function ArticlePage() {
         </p>
 
         {article.image_url ? (
-          <img
+          <EditorialImage
             src={article.image_url}
             alt={article.title}
             width={1200}
             height={675}
+            eager
             className="mt-6 aspect-[16/9] w-full object-cover"
           />
         ) : null}

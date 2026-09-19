@@ -67,7 +67,7 @@ function HomePage() {
       <form
         role="search"
         onSubmit={(event) => event.preventDefault()}
-        className="mb-8 flex items-center gap-2 border border-border bg-card px-3 py-2"
+        className="mb-10 flex items-center gap-3 border-y border-border bg-card px-4 py-3"
       >
         <label htmlFor="site-search" className="kicker">
           {dict.search}
@@ -98,12 +98,12 @@ function HomePage() {
         <p className="py-16 text-center text-muted-foreground">{dict.empty}</p>
       ) : (
         <>
-          <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
+           <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_300px]">
             <div>
               <p className="kicker">{dict.breaking}</p>
               {lead ? <NewsCard article={lead} lang={lang} variant="lead" className="mt-2" /> : null}
 
-              <div className="mt-8 grid gap-6 sm:grid-cols-2">
+              <div className="mt-10 grid gap-x-7 gap-y-8 sm:grid-cols-2">
                 {rest.slice(0, 6).map((item) => (
                   <NewsCard key={item.id} article={item} lang={lang} />
                 ))}

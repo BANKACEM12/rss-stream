@@ -37,22 +37,22 @@ export function SiteHeader({ lang }: { lang: Lang }) {
 
   return (
     <header className="border-b border-border bg-card">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-2 text-xs text-muted-foreground">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-2.5 text-xs text-muted-foreground">
         <span className="hidden sm:inline">{today}</span>
         <LanguageSwitcher lang={lang} />
       </div>
 
-      <div className="mx-auto max-w-6xl border-y border-border px-4 py-6 text-center">
+      <div className="mx-auto max-w-6xl border-y border-border px-4 py-7 text-center md:py-9">
         <Link to="/$lang" params={{ lang }} className="inline-block">
-          <span className="block font-display text-3xl font-black tracking-tight md:text-5xl">
+          <span className="block font-display text-4xl font-black md:text-6xl">
             {dict.siteName}
           </span>
         </Link>
-        <p className="mt-2 text-xs text-muted-foreground md:text-sm">{dict.tagline}</p>
+        <p className="mx-auto mt-2 max-w-xl text-xs text-muted-foreground md:text-sm">{dict.tagline}</p>
       </div>
 
-      <nav className="mx-auto max-w-6xl px-4">
-        <ul className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 py-3 text-sm font-semibold">
+      <nav className="mx-auto max-w-6xl overflow-x-auto px-4">
+        <ul className="flex min-w-max items-center justify-center gap-x-6 py-3.5 text-sm font-semibold">
           <li>
             <Link
               to="/$lang"

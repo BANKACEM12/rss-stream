@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 
+import { EditorialImage } from "@/components/news/EditorialImage";
 import type { Article } from "@/lib/news.functions";
 import { DICT, formatDate, type Category, type Lang } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
@@ -37,7 +38,7 @@ export function NewsCard({ article, lang, variant = "standard", className }: Pro
   return (
     <article
       className={cn(
-        "group flex flex-col border-b border-border pb-5",
+        "group flex flex-col border-b border-border pb-6",
         isLead && "gap-3",
         className,
       )}
@@ -46,17 +47,16 @@ export function NewsCard({ article, lang, variant = "standard", className }: Pro
         <Link
           to="/$lang/articles/$slug"
           params={{ lang, slug: article.slug }}
-          className="mb-3 block overflow-hidden bg-secondary"
+          className="mb-4 block overflow-hidden bg-secondary"
         >
-          <img
+          <EditorialImage
             src={article.image_url}
             alt={article.title}
-            loading="lazy"
             width={isLead ? 1200 : 640}
             height={isLead ? 675 : 360}
+            eager={isLead}
             className={cn(
-              "w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]",
-              isLead ? "aspect-[16/9]" : "aspect-[16/9]",
+              "aspect-[16/9] w-full transition-transform duration-500 group-hover:scale-[1.015]",
             )}
           />
         </Link>
@@ -66,8 +66,8 @@ export function NewsCard({ article, lang, variant = "standard", className }: Pro
 
       <h3
         className={cn(
-          "mt-1 font-display font-bold leading-tight",
-          isLead ? "text-2xl md:text-4xl" : "text-lg md:text-xl",
+          "mt-1 font-display font-bold leading-[1.25]",
+          isLead ? "text-3xl md:text-[2.65rem]" : "text-xl",
         )}
       >
         <Link
@@ -82,7 +82,7 @@ export function NewsCard({ article, lang, variant = "standard", className }: Pro
       {article.summary ? (
         <p
           className={cn(
-            "mt-2 text-muted-foreground",
+            "mt-2.5 leading-relaxed text-muted-foreground",
             isLead ? "text-base md:text-lg" : "text-sm",
           )}
         >
