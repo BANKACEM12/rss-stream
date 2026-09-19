@@ -36,11 +36,11 @@ function LangLayout() {
       <div className="mx-auto max-w-6xl px-4 pt-4">
         <AdSlot label={dict.advertisement} variant="leaderboard" />
       </div>
-      <main className="mx-auto max-w-6xl px-4 py-8">
+      <main className="mx-auto max-w-6xl px-4 py-8 md:py-10">
         <Outlet />
       </main>
       <SiteFooter lang={lang} />
-      <div className="sticky bottom-0 z-40 border-t border-border bg-card px-4 py-1">
+      <div className="border-t border-border bg-card px-4 py-1">
         <div className="mx-auto max-w-6xl">
           <AdSlot label={dict.advertisement} variant="footer" />
         </div>

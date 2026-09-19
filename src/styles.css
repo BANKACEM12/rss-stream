@@ -155,11 +155,8 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
-    background-image: radial-gradient(
-      oklch(0.19 0.012 60 / 3.5%) 1px,
-      transparent 1px
-    );
-    background-size: 22px 22px;
+    background-image: linear-gradient(oklch(0.19 0.012 60 / 1.8%) 1px, transparent 1px);
+    background-size: 100% 32px;
   }
 
   h1,
@@ -181,7 +178,7 @@
 
 @utility kicker {
   font-size: 0.7rem;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   font-weight: 600;
   color: var(--color-crimson);
@@ -203,9 +200,9 @@
   align-items: center;
   justify-content: center;
   border: 1px dashed var(--color-rule);
-  background-color: oklch(0.95 0.012 82);
+  background-color: var(--color-muted);
   color: var(--color-muted-foreground);
   font-size: 0.7rem;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
