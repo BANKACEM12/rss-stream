@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 
 import { EditorialImage } from "@/components/news/EditorialImage";
+import { categoryImage } from "@/lib/category-images";
 import type { Article } from "@/lib/news.functions";
 import { DICT, formatDate, type Category, type Lang } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
