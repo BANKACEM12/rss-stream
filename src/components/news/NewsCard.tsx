@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 
 import { EditorialImage } from "@/components/news/EditorialImage";
+import { categoryImage } from "@/lib/category-images";
 import type { Article } from "@/lib/news.functions";
 import { DICT, formatDate, type Category, type Lang } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
@@ -43,24 +44,22 @@ export function NewsCard({ article, lang, variant = "standard", className }: Pro
         className,
       )}
     >
-      {article.image_url ? (
-        <Link
-          to="/$lang/articles/$slug"
-          params={{ lang, slug: article.slug }}
-          className="mb-4 block overflow-hidden bg-secondary"
-        >
-          <EditorialImage
-            src={article.image_url}
-            alt={article.title}
-            width={isLead ? 1200 : 640}
-            height={isLead ? 675 : 360}
-            eager={isLead}
-            className={cn(
-              "aspect-[16/9] w-full transition-transform duration-500 group-hover:scale-[1.015]",
-            )}
-          />
-        </Link>
-      ) : null}
+      <Link
+        to="/$lang/articles/$slug"
+        params={{ lang, slug: article.slug }}
+        className="mb-4 block overflow-hidden bg-secondary"
+      >
+        <EditorialImage
+          src={article.image_url ?? categoryImage(article.category)}
+          alt={article.title}
+          width={isLead ? 1200 : 640}
+          height={isLead ? 675 : 360}
+          eager={isLead}
+          className={cn(
+            "aspect-[16/9] w-full transition-transform duration-500 group-hover:scale-[1.015]",
+          )}
+        />
+      </Link>
 
       <span className="kicker">{categoryLabel}</span>
 

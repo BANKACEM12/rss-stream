@@ -5,6 +5,7 @@ import { AdSlot } from "@/components/news/AdSlot";
 import { EditorialImage } from "@/components/news/EditorialImage";
 import { GlobalScoreBox } from "@/components/news/GlobalScoreBox";
 import { RelatedStories } from "@/components/news/RelatedStories";
+import { categoryImage } from "@/lib/category-images";
 import { getArticle } from "@/lib/news.functions";
 import { DICT, LANGS, formatDate, type Category, type Lang } from "@/lib/i18n";
 
@@ -133,16 +134,14 @@ function ArticlePage() {
           {dict.publishedAt} <time dateTime={article.published_at}>{formatDate(article.published_at, lang)}</time>
         </p>
 
-        {article.image_url ? (
-          <EditorialImage
-            src={article.image_url}
-            alt={article.title}
-            width={1200}
-            height={675}
-            eager
-            className="mt-6 aspect-[16/9] w-full object-cover"
-          />
-        ) : null}
+        <EditorialImage
+          src={article.image_url ?? categoryImage(article.category)}
+          alt={article.title}
+          width={1200}
+          height={675}
+          eager
+          className="mt-6 aspect-[16/9] w-full object-cover"
+        />
 
         <p className="mt-6 text-lg leading-relaxed">{article.summary}</p>
 
