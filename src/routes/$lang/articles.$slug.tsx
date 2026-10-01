@@ -127,7 +127,7 @@ function ArticlePage() {
     <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
       <article>
         <p className="kicker">{dict.categories[article.category as Category] ?? article.category}</p>
-        <h1 className="mt-2 font-display text-3xl font-black leading-tight md:text-4xl">
+        <h1 className="mt-2 font-display text-2xl font-black leading-tight md:text-4xl">
           {article.title}
         </h1>
         <p className="mt-3 text-sm text-muted-foreground">
@@ -180,7 +180,7 @@ function ArticlePage() {
 
       <aside className="space-y-6">
         {article.category === "sports" ? <GlobalScoreBox lang={lang} /> : null}
-        <AdSlot label={dict.advertisement} variant="sidebar" />
+        <AdSlot label={dict.advertisement} variant="sidebar" className="hidden lg:flex" />
       </aside>
     </div>
   );

@@ -127,7 +127,7 @@ function HomePage() {
                 </div>
               </section>
               <GlobalScoreBox lang={lang} />
-              <AdSlot label={dict.advertisement} variant="sidebar" />
+              <AdSlot label={dict.advertisement} variant="sidebar" className="hidden lg:flex" />
             </aside>
           </div>
 

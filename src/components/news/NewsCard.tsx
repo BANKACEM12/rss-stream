@@ -82,7 +82,7 @@ export function NewsCard({ article, lang, variant = "standard", className }: Pro
         <p
           className={cn(
             "mt-2.5 leading-relaxed text-muted-foreground",
-            isLead ? "text-base md:text-lg" : "text-sm",
+            isLead ? "text-base md:text-lg" : "line-clamp-3 text-sm",
           )}
         >
           {article.summary}

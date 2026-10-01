@@ -123,7 +123,7 @@ function CategoryPage() {
 
       <aside className="space-y-6">
         {category === "sports" ? <GlobalScoreBox lang={lang} /> : null}
-        <AdSlot label={dict.advertisement} variant="sidebar" />
+        <AdSlot label={dict.advertisement} variant="sidebar" className="hidden lg:flex" />
       </aside>
     </div>
   );

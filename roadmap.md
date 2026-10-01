@@ -15,3 +15,7 @@
 - [x] النشر (تم طلب النشر على rss-stream.lovable.app)
 - [x] توثيق ملكية الموقع في Google Search Console (ملف التحقق) + إضافة الموقع + إرسال sitemap.xml
 - [x] صور احترافية احتياطية للمقالات التي بلا صورة (لكل تصنيف)
+- [x] إصلاح مشكلة Breadcrumbs في Google Search Console (روابط itemListElement.item أصبحت كاملة https)
+- [x] روابط canonical / og:url / hreflang / JSON-LD كاملة (مطلقة) عبر SITE_URL
+- [x] تنظيف slugs الجديدة من الرموز والعلامات والتشكيل (قص عند حدود الكلمة)
+- [x] تحسين عرض الهاتف (قائمة لاصقة، عنوان مضغوط، إخفاء إعلان sidebar الطويل على الجوال)
