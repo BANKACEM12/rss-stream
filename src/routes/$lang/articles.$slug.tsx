@@ -7,6 +7,7 @@ import { GlobalScoreBox } from "@/components/news/GlobalScoreBox";
 import { RelatedStories } from "@/components/news/RelatedStories";
 import { categoryImage } from "@/lib/category-images";
 import { getArticle } from "@/lib/news.functions";
+import { absUrl } from "@/lib/seo";
 import { DICT, LANGS, formatDate, type Category, type Lang } from "@/lib/i18n";
 
 const articleQuery = (lang: Lang, slug: string) =>
@@ -38,6 +39,7 @@ export const Route = createFileRoute("/$lang/articles/$slug")({
     const { article } = loaderData;
     const description = article.summary ?? article.title;
     const path = `/${lang}/articles/${article.slug}`;
+    const url = absUrl(path);
     return {
       meta: [
         { title: `${article.title} — ${dict.siteName}` },
@@ -51,7 +53,7 @@ export const Route = createFileRoute("/$lang/articles/$slug")({
         { property: "og:title", content: article.title },
         { property: "og:description", content: description },
         { property: "og:type", content: "article" },
-        { property: "og:url", content: path },
+        { property: "og:url", content: url },
         { property: "og:locale", content: lang === "zh" ? "zh_CN" : lang },
         { property: "article:published_time", content: article.published_at },
         { property: "article:section", content: dict.categories[article.category as Category] ?? article.category },
@@ -64,7 +66,7 @@ export const Route = createFileRoute("/$lang/articles/$slug")({
             ]
           : []),
       ],
-      links: [{ rel: "canonical", href: path }],
+      links: [{ rel: "canonical", href: url }],
       scripts: [
         {
           type: "application/ld+json",
@@ -82,8 +84,8 @@ export const Route = createFileRoute("/$lang/articles/$slug")({
             dateModified: article.published_at,
             articleSection: dict.categories[article.category as Category] ?? article.category,
             ...(article.keywords?.length ? { keywords: article.keywords.join(", ") } : {}),
-            url: path,
-            mainEntityOfPage: { "@type": "WebPage", "@id": path },
+            url,
+            mainEntityOfPage: { "@type": "WebPage", "@id": url },
           }),
         },
         {
@@ -92,14 +94,14 @@ export const Route = createFileRoute("/$lang/articles/$slug")({
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             itemListElement: [
-              { "@type": "ListItem", position: 1, name: dict.siteName, item: `/${lang}` },
+              { "@type": "ListItem", position: 1, name: dict.siteName, item: absUrl(`/${lang}`) },
               {
                 "@type": "ListItem",
                 position: 2,
                 name: dict.categories[article.category as Category] ?? article.category,
-                item: `/${lang}/category/${article.category}`,
+                item: absUrl(`/${lang}/category/${article.category}`),
               },
-              { "@type": "ListItem", position: 3, name: article.title, item: path },
+              { "@type": "ListItem", position: 3, name: article.title, item: url },
             ],
           }),
         },
