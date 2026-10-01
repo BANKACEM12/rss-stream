@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { SITE_URL } from "../lib/seo";
 
 function NotFoundComponent() {
   return (
@@ -113,20 +114,20 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "@graph": [
             {
               "@type": "NewsMediaOrganization",
-              "@id": "/#organization",
+              "@id": `${SITE_URL}/#organization`,
               name: "NewsPulse",
               alternateName: "نبض الأخبار",
-              url: "/",
+              url: SITE_URL,
               description:
                 "موقع تجميع أخبار يعرض عناوين ومقتطفات قصيرة مع رابط المصدر الأصلي بثلاث لغات.",
             },
             {
               "@type": "WebSite",
-              "@id": "/#website",
+              "@id": `${SITE_URL}/#website`,
               name: "NewsPulse",
-              url: "/",
+              url: SITE_URL,
               inLanguage: ["ar", "en", "zh"],
-              publisher: { "@id": "/#organization" },
+              publisher: { "@id": `${SITE_URL}/#organization` },
             },
           ],
         }),

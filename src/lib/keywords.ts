@@ -28,15 +28,25 @@ export function extractKeywords(text: string, limit = 6): string[] {
     .map(([word]) => word);
 }
 
+/**
+ * SEO-friendly slug: letters and numbers only (Arabic / Chinese / Latin),
+ * no punctuation, symbols, diacritics or tatweel, words joined by single
+ * hyphens, cut on a word boundary.
+ */
 export function slugify(text: string, fallback: string): string {
-  const base = text
+  let base = text
     .toLowerCase()
     .normalize("NFKD")
+    .replace(/[ـ­]/g, "") // tatweel + soft hyphen
+    .replace(/\p{M}/gu, "") // accents / harakat
     .replace(/[^\p{L}\p{N}\s-]/gu, "")
     .trim()
-    .replace(/\s+/g, "-")
-    .slice(0, 70)
+    .replace(/[\s_-]+/g, "-")
     .replace(/^-+|-+$/g, "");
+  if (base.length > 60) {
+    const cut = base.slice(0, 60);
+    base = (cut.includes("-") ? cut.replace(/-[^-]*$/, "") : cut).replace(/-+$/g, "");
+  }
   return `${base || "story"}-${fallback}`;
 }
 

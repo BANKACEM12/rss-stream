@@ -42,17 +42,17 @@ export function SiteHeader({ lang }: { lang: Lang }) {
         <LanguageSwitcher lang={lang} />
       </div>
 
-      <div className="mx-auto max-w-6xl border-y border-border px-4 py-7 text-center md:py-9">
+      <div className="mx-auto max-w-6xl border-y border-border px-4 py-5 text-center md:py-9">
         <Link to="/$lang" params={{ lang }} className="inline-block">
-          <span className="block font-display text-4xl font-black md:text-6xl">
+          <span className="block font-display text-[2rem] font-black leading-tight md:text-6xl">
             {dict.siteName}
           </span>
         </Link>
         <p className="mx-auto mt-2 max-w-xl text-xs text-muted-foreground md:text-sm">{dict.tagline}</p>
       </div>
 
-      <nav className="mx-auto max-w-6xl overflow-x-auto px-4">
-        <ul className="flex min-w-max items-center justify-center gap-x-6 py-3.5 text-sm font-semibold">
+      <nav className="sticky top-0 z-20 -mx-0 border-b border-border bg-card/95 backdrop-blur-sm">
+        <ul className="mx-auto flex max-w-6xl items-center gap-x-5 overflow-x-auto px-4 py-3 text-[13px] font-semibold md:justify-center md:gap-x-6 md:text-sm">
           <li>
             <Link
               to="/$lang"
