@@ -6,6 +6,7 @@ import { AdSlot } from "@/components/news/AdSlot";
 import { GlobalScoreBox } from "@/components/news/GlobalScoreBox";
 import { NewsCard } from "@/components/news/NewsCard";
 import { listHomeArticles } from "@/lib/news.functions";
+import { absUrl } from "@/lib/seo";
 import { CATEGORIES, DICT, LANGS, type Lang } from "@/lib/i18n";
 
 const homeQuery = (lang: Lang) =>
@@ -31,12 +32,16 @@ export const Route = createFileRoute("/$lang/")({
         { property: "og:title", content: title },
         { property: "og:description", content: dict.tagline },
         { property: "og:type", content: "website" },
-        { property: "og:url", content: `/${lang}` },
+        { property: "og:url", content: absUrl(`/${lang}`) },
       ],
       links: [
-        { rel: "canonical", href: `/${lang}` },
-        ...LANGS.map((code) => ({ rel: "alternate", hrefLang: code, href: `/${code}` })),
-        { rel: "alternate", hrefLang: "x-default", href: "/en" },
+        { rel: "canonical", href: absUrl(`/${lang}`) },
+        ...LANGS.map((code) => ({
+          rel: "alternate",
+          hrefLang: code,
+          href: absUrl(`/${code}`),
+        })),
+        { rel: "alternate", hrefLang: "x-default", href: absUrl("/en") },
       ],
     };
   },

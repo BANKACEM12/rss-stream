@@ -5,6 +5,7 @@ import { AdSlot } from "@/components/news/AdSlot";
 import { GlobalScoreBox } from "@/components/news/GlobalScoreBox";
 import { NewsCard } from "@/components/news/NewsCard";
 import { listCategoryArticles } from "@/lib/news.functions";
+import { absUrl } from "@/lib/seo";
 import { CATEGORIES, DICT, LANGS, type Category, type Lang } from "@/lib/i18n";
 
 const categoryQuery = (lang: Lang, category: Category) =>
@@ -35,6 +36,7 @@ export const Route = createFileRoute("/$lang/category/$slug")({
     const dict = DICT[lang];
     const title = `${dict.categories[category]} — ${dict.siteName}`;
     const description = `${dict.latest}: ${dict.categories[category]}. ${dict.footer.disclaimer}`;
+    const url = absUrl(`/${lang}/category/${category}`);
     return {
       meta: [
         { title },
@@ -42,16 +44,16 @@ export const Route = createFileRoute("/$lang/category/$slug")({
         { property: "og:title", content: title },
         { property: "og:description", content: description },
         { property: "og:type", content: "website" },
-        { property: "og:url", content: `/${lang}/category/${category}` },
+        { property: "og:url", content: url },
       ],
       links: [
-        { rel: "canonical", href: `/${lang}/category/${category}` },
+        { rel: "canonical", href: url },
         ...LANGS.map((code) => ({
           rel: "alternate",
           hrefLang: code,
-          href: `/${code}/category/${category}`,
+          href: absUrl(`/${code}/category/${category}`),
         })),
-        { rel: "alternate", hrefLang: "x-default", href: `/en/category/${category}` },
+        { rel: "alternate", hrefLang: "x-default", href: absUrl(`/en/category/${category}`) },
       ],
       scripts: [
         {
@@ -62,16 +64,16 @@ export const Route = createFileRoute("/$lang/category/$slug")({
             name: dict.categories[category],
             description,
             inLanguage: lang,
-            url: `/${lang}/category/${category}`,
+            url,
             breadcrumb: {
               "@type": "BreadcrumbList",
               itemListElement: [
-                { "@type": "ListItem", position: 1, name: dict.siteName, item: `/${lang}` },
+                { "@type": "ListItem", position: 1, name: dict.siteName, item: absUrl(`/${lang}`) },
                 {
                   "@type": "ListItem",
                   position: 2,
                   name: dict.categories[category],
-                  item: `/${lang}/category/${category}`,
+                  item: url,
                 },
               ],
             },
