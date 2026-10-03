@@ -23,6 +23,7 @@ import { Route as LangPrivacyRouteImport } from './routes/$lang/privacy'
 import { Route as LangTermsRouteImport } from './routes/$lang/terms'
 import { Route as LangArticlesSlugRouteImport } from './routes/$lang/articles.$slug'
 import { Route as LangCategorySlugRouteImport } from './routes/$lang/category.$slug'
+import { Route as ApiPublicGenerateArticlesRouteImport } from './routes/api/public/generate-articles'
 import { Route as ApiPublicIngestRouteImport } from './routes/api/public/ingest'
 
 const IndexRoute = IndexRouteImport.update({
@@ -95,6 +96,12 @@ const LangCategorySlugRoute = LangCategorySlugRouteImport.update({
   path: '/category/$slug',
   getParentRoute: () => LangRouteRoute,
 } as any)
+const ApiPublicGenerateArticlesRoute =
+  ApiPublicGenerateArticlesRouteImport.update({
+    id: '/api/public/generate-articles',
+    path: '/api/public/generate-articles',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicIngestRoute = ApiPublicIngestRouteImport.update({
   id: '/api/public/ingest',
   path: '/api/public/ingest',
@@ -116,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/$lang/': typeof LangIndexRoute
   '/$lang/articles/$slug': typeof LangArticlesSlugRoute
   '/$lang/category/$slug': typeof LangCategorySlugRoute
+  '/api/public/generate-articles': typeof ApiPublicGenerateArticlesRoute
   '/api/public/ingest': typeof ApiPublicIngestRoute
 }
 export interface FileRoutesByTo {
@@ -132,6 +140,7 @@ export interface FileRoutesByTo {
   '/$lang': typeof LangIndexRoute
   '/$lang/articles/$slug': typeof LangArticlesSlugRoute
   '/$lang/category/$slug': typeof LangCategorySlugRoute
+  '/api/public/generate-articles': typeof ApiPublicGenerateArticlesRoute
   '/api/public/ingest': typeof ApiPublicIngestRoute
 }
 export interface FileRoutesById {
@@ -150,6 +159,7 @@ export interface FileRoutesById {
   '/$lang/': typeof LangIndexRoute
   '/$lang/articles/$slug': typeof LangArticlesSlugRoute
   '/$lang/category/$slug': typeof LangCategorySlugRoute
+  '/api/public/generate-articles': typeof ApiPublicGenerateArticlesRoute
   '/api/public/ingest': typeof ApiPublicIngestRoute
 }
 export interface FileRouteTypes {
@@ -169,6 +179,7 @@ export interface FileRouteTypes {
     | '/$lang/'
     | '/$lang/articles/$slug'
     | '/$lang/category/$slug'
+    | '/api/public/generate-articles'
     | '/api/public/ingest'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -185,6 +196,7 @@ export interface FileRouteTypes {
     | '/$lang'
     | '/$lang/articles/$slug'
     | '/$lang/category/$slug'
+    | '/api/public/generate-articles'
     | '/api/public/ingest'
   id:
     | '__root__'
@@ -202,6 +214,7 @@ export interface FileRouteTypes {
     | '/$lang/'
     | '/$lang/articles/$slug'
     | '/$lang/category/$slug'
+    | '/api/public/generate-articles'
     | '/api/public/ingest'
   fileRoutesById: FileRoutesById
 }
@@ -212,6 +225,7 @@ export interface RootRouteChildren {
   SitemapNewsDotxmlRoute: typeof SitemapNewsDotxmlRoute
   SitemapPagesDotxmlRoute: typeof SitemapPagesDotxmlRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  ApiPublicGenerateArticlesRoute: typeof ApiPublicGenerateArticlesRoute
   ApiPublicIngestRoute: typeof ApiPublicIngestRoute
 }
 
@@ -315,6 +329,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LangCategorySlugRouteImport
       parentRoute: typeof LangRouteRoute
     }
+    '/api/public/generate-articles': {
+      id: '/api/public/generate-articles'
+      path: '/api/public/generate-articles'
+      fullPath: '/api/public/generate-articles'
+      preLoaderRoute: typeof ApiPublicGenerateArticlesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/ingest': {
       id: '/api/public/ingest'
       path: '/api/public/ingest'
@@ -358,6 +379,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapNewsDotxmlRoute: SitemapNewsDotxmlRoute,
   SitemapPagesDotxmlRoute: SitemapPagesDotxmlRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  ApiPublicGenerateArticlesRoute: ApiPublicGenerateArticlesRoute,
   ApiPublicIngestRoute: ApiPublicIngestRoute,
 }
 export const routeTree = rootRouteImport
