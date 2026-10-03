@@ -1,0 +1,10 @@
+ALTER TABLE public.articles
+  ADD COLUMN IF NOT EXISTS body TEXT,
+  ADD COLUMN IF NOT EXISTS body_model TEXT,
+  ADD COLUMN IF NOT EXISTS body_attempts INTEGER NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS body_started_at TIMESTAMP WITH TIME ZONE,
+  ADD COLUMN IF NOT EXISTS body_generated_at TIMESTAMP WITH TIME ZONE;
+
+CREATE INDEX IF NOT EXISTS articles_body_queue_idx
+  ON public.articles (published_at DESC)
+  WHERE body IS NULL;
