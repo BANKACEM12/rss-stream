@@ -16,6 +16,11 @@ export type Database = {
     Tables: {
       articles: {
         Row: {
+          body: string | null
+          body_attempts: number
+          body_generated_at: string | null
+          body_model: string | null
+          body_started_at: string | null
           category: string
           created_at: string
           guid: string
@@ -32,6 +37,11 @@ export type Database = {
           title: string
         }
         Insert: {
+          body?: string | null
+          body_attempts?: number
+          body_generated_at?: string | null
+          body_model?: string | null
+          body_started_at?: string | null
           category: string
           created_at?: string
           guid: string
@@ -48,6 +58,11 @@ export type Database = {
           title: string
         }
         Update: {
+          body?: string | null
+          body_attempts?: number
+          body_generated_at?: string | null
+          body_model?: string | null
+          body_started_at?: string | null
           category?: string
           created_at?: string
           guid?: string
