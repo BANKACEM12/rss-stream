@@ -117,6 +117,11 @@ export async function chatCompletion(
     }
   }
 
+  if (finished) {
+    // Release the keep-alive SSE connection instead of waiting for the timeout.
+    void reader.cancel().catch(() => {});
+  }
+
   if (!output.trim()) {
     const error = streamError ?? "empty completion";
     return {
