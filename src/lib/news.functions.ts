@@ -17,10 +17,12 @@ export type Article = {
   image_url: string | null;
   keywords: string[];
   published_at: string;
+  body: string | null;
+  body_generated_at: string | null;
 };
 
 const SELECT =
-  "id, slug, title, summary, link, source_name, source_url, lang, category, image_url, keywords, published_at";
+  "id, slug, title, summary, link, source_name, source_url, lang, category, image_url, keywords, published_at, body, body_generated_at";
 
 function publicClient() {
   const key = process.env["SUPABASE_PUBLISHABLE_KEY"]!;

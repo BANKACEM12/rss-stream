@@ -130,7 +130,7 @@ function internalLinksBlock(article: QueueArticle, related: RelatedLink[]): stri
     );
   const categoryLabel = dict.categories[article.category as keyof typeof dict.categories] ?? article.category;
   links.push(`<a href="/${lang}/category/${article.category}">${escapeHtml(categoryLabel)}</a>`);
-  const label = READ_ALSO[lang] ?? READ_ALSO.en!;
+  const label = READ_ALSO[lang] ?? READ_ALSO["en"]!;
   return `<p><strong>${label}:</strong> ${links.join(" · ")}</p>`;
 }
 

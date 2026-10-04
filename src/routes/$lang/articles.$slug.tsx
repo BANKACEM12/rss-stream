@@ -147,6 +147,13 @@ function ArticlePage() {
 
         <p className="mt-6 text-lg leading-relaxed">{article.summary}</p>
 
+        {article.body ? (
+          <div
+            className="article-body mt-6 border-t border-border pt-2"
+            dangerouslySetInnerHTML={{ __html: article.body }}
+          />
+        ) : null}
+
         <a
           href={article.link}
           target="_blank"
