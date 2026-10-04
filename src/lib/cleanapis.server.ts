@@ -81,8 +81,9 @@ export async function chatCompletion(
   let buffer = "";
   let output = "";
   let streamError: string | null = null;
+  let finished = false;
 
-  for (;;) {
+  outer: for (;;) {
     const { done, value } = await reader.read();
     if (done) break;
     buffer += decoder.decode(value, { stream: true });
@@ -92,7 +93,13 @@ export async function chatCompletion(
       buffer = buffer.slice(idx + 1);
       if (!line.startsWith("data:")) continue;
       const payload = line.slice(5).trim();
-      if (!payload || payload === "[DONE]") continue;
+      if (!payload) continue;
+      if (payload === "[DONE]") {
+        // Clean APIs keeps SSE connections alive after completion
+        // ("hour-long connections") — stop at [DONE] instead of hanging.
+        finished = true;
+        break outer;
+      }
       try {
         const json = JSON.parse(payload) as {
           error?: { message?: string };
@@ -108,6 +115,11 @@ export async function chatCompletion(
         // Partial JSON chunk — ignored; SSE lines here arrive line-aligned.
       }
     }
+  }
+
+  if (finished) {
+    // Release the keep-alive SSE connection instead of waiting for the timeout.
+    void reader.cancel().catch(() => {});
   }
 
   if (!output.trim()) {

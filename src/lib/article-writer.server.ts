@@ -130,7 +130,7 @@ function internalLinksBlock(article: QueueArticle, related: RelatedLink[]): stri
     );
   const categoryLabel = dict.categories[article.category as keyof typeof dict.categories] ?? article.category;
   links.push(`<a href="/${lang}/category/${article.category}">${escapeHtml(categoryLabel)}</a>`);
-  const label = READ_ALSO[lang] ?? READ_ALSO.en!;
+  const label = READ_ALSO[lang] ?? READ_ALSO["en"]!;
   return `<p><strong>${label}:</strong> ${links.join(" · ")}</p>`;
 }
 
@@ -140,7 +140,7 @@ export async function writeArticle(
   related: RelatedLink[],
 ): Promise<WriteResult> {
   const messages = buildMessages(article);
-  let lastError = "no models configured";
+  const errors: string[] = [];
   let sawProviderDown = 0;
   let tried = 0;
 
@@ -148,26 +148,28 @@ export async function writeArticle(
     tried++;
     const res = await chatCompletion(apiKey, model, messages);
     if (!res.ok) {
-      lastError = `${model}: ${res.error}`.slice(0, 240);
+      errors.push(`${model}: ${res.error}`.slice(0, 200));
       if (res.billing) {
         // Account-level problem: no model will work — stop immediately.
-        return { ok: false, error: lastError, fatal: true };
+        return { ok: false, error: errors.join(" | ").slice(0, 700), fatal: true };
       }
       if (res.providerDown) sawProviderDown++;
       continue;
     }
     const raw = extractBodyHtml(res.text);
     if (!raw) {
-      lastError = `${model}: unparseable response`;
+      errors.push(`${model}: unparseable response (${res.text.slice(0, 80)})`);
       continue;
     }
     const clean = sanitizeArticleHtml(raw);
     if (wordCount(clean) < 120) {
-      lastError = `${model}: article too short`;
+      errors.push(`${model}: article too short`);
       continue;
     }
     return { ok: true, bodyHtml: `${clean}${internalLinksBlock(article, related)}`, model };
   }
+
+  const lastError = (errors.length ? errors.join(" | ") : "no models configured").slice(0, 700);
 
   // Every model failed at the provider level (5xx/network): the account is
   // fine, the gateway is down — don't burn per-article retry budget.

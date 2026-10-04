@@ -206,3 +206,60 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
+
+/* AI-written article body (sanitized HTML rendered via dangerouslySetInnerHTML). */
+.article-body {
+  font-size: 1.05rem;
+  line-height: 1.9;
+  color: var(--color-foreground);
+}
+
+.article-body p {
+  margin-block: 1.1em;
+}
+
+.article-body h2 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.35rem;
+  line-height: 1.35;
+  margin-block: 1.6em 0.6em;
+  padding-inline-start: 0.6rem;
+  border-inline-start: 3px solid var(--color-crimson);
+}
+
+.article-body h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.15rem;
+  margin-block: 1.3em 0.5em;
+}
+
+.article-body ul,
+.article-body ol {
+  margin-block: 1.1em;
+  padding-inline-start: 1.4rem;
+  list-style: square;
+}
+
+.article-body li {
+  margin-block: 0.4em;
+}
+
+.article-body a {
+  color: var(--color-crimson);
+  text-decoration-line: underline;
+  text-underline-offset: 3px;
+  font-weight: 600;
+}
+
+.article-body blockquote {
+  border-inline-start: 3px solid var(--color-rule);
+  padding-inline-start: 1rem;
+  color: var(--color-muted-foreground);
+  margin-block: 1.2em;
+}
+
+.article-body strong {
+  font-weight: 700;
+}
