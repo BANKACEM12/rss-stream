@@ -37,12 +37,22 @@ export function SiteHeader({ lang }: { lang: Lang }) {
 
   return (
     <header className="border-b border-border bg-card">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-2.5 text-xs text-muted-foreground">
-        <span className="hidden sm:inline">{today}</span>
+      {/* Mobile: one compact row with logo + languages */}
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-2.5 md:hidden">
+        <Link to="/$lang" params={{ lang }} className="min-w-0">
+          <span className="block truncate font-display text-2xl font-black leading-none">{dict.siteName}</span>
+        </Link>
+        <div className="shrink-0">
+          <LanguageSwitcher lang={lang} />
+        </div>
+      </div>
+
+      <div className="mx-auto hidden max-w-6xl items-center justify-between gap-4 px-4 py-2.5 text-xs text-muted-foreground md:flex">
+        <span>{today}</span>
         <LanguageSwitcher lang={lang} />
       </div>
 
-      <div className="mx-auto max-w-6xl border-y border-border px-4 py-5 text-center md:py-9">
+      <div className="mx-auto hidden max-w-6xl border-y border-border px-4 py-9 text-center md:block">
         <Link to="/$lang" params={{ lang }} className="inline-block">
           <span className="block font-display text-[2rem] font-black leading-tight md:text-6xl">
             {dict.siteName}
@@ -52,7 +62,7 @@ export function SiteHeader({ lang }: { lang: Lang }) {
       </div>
 
       <nav className="sticky top-0 z-20 -mx-0 border-b border-border bg-card/95 backdrop-blur-sm">
-        <ul className="mx-auto flex max-w-6xl items-center gap-x-5 overflow-x-auto px-4 py-3 text-[13px] font-semibold md:justify-center md:gap-x-6 md:text-sm">
+        <ul className="mx-auto flex max-w-6xl items-center gap-x-5 overflow-x-auto whitespace-nowrap px-4 py-2.5 text-[13px] font-semibold [scrollbar-width:none] md:justify-center md:gap-x-6 md:py-3 md:text-sm">
           <li>
             <Link
               to="/$lang"
