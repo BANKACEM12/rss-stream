@@ -40,7 +40,7 @@ export function SiteHeader({ lang }: { lang: Lang }) {
       {/* Mobile: one compact row with logo + languages */}
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-2.5 md:hidden">
         <Link to="/$lang" params={{ lang }} className="min-w-0">
-          <span className="block truncate font-display text-2xl font-black leading-none">{dict.siteName}</span>
+          <span className="block truncate py-0.5 font-display text-2xl font-black leading-snug">{dict.siteName}</span>
         </Link>
         <div className="shrink-0">
           <LanguageSwitcher lang={lang} />
