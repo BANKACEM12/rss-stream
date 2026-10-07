@@ -66,7 +66,7 @@ export function NewsCard({ article, lang, variant = "standard", className }: Pro
       <h3
         className={cn(
           "mt-1 font-display font-bold leading-[1.25]",
-          isLead ? "text-3xl md:text-[2.65rem]" : "text-xl",
+          isLead ? "text-[1.6rem] md:text-[2.65rem]" : "text-lg md:text-xl",
         )}
       >
         <Link
