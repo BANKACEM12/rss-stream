@@ -57,7 +57,13 @@ export async function chatCompletion(
         "content-type": "application/json",
         accept: "text/event-stream",
       },
-      body: JSON.stringify({ model, messages, stream: true, max_tokens: maxTokens }),
+      // NOTE: sending max_tokens makes this provider return empty 0-token
+      // streams for long prompts, so it is only sent for tiny probes.
+      body: JSON.stringify(
+        maxTokens < 100
+          ? { model, messages, stream: true, max_tokens: maxTokens }
+          : { model, messages, stream: true },
+      ),
       signal: AbortSignal.timeout(150_000),
     });
   } catch (error) {

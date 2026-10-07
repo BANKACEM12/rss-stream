@@ -146,7 +146,13 @@ export async function writeArticle(
 
   for (const model of modelChain()) {
     tried++;
-    const res = await chatCompletion(apiKey, model, messages);
+    // The provider intermittently returns an empty stream (0 tokens) —
+    // retry the same model a few times before falling back.
+    let res = await chatCompletion(apiKey, model, messages);
+    for (let retry = 0; retry < 3 && !res.ok && res.error === "empty completion"; retry++) {
+      await new Promise((r) => setTimeout(r, 1500));
+      res = await chatCompletion(apiKey, model, messages);
+    }
     if (!res.ok) {
       errors.push(`${model}: ${res.error}`.slice(0, 200));
       if (res.billing) {
