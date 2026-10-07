@@ -8,7 +8,8 @@ type Props = {
 
 /** Fixed-height ad placeholders so nothing shifts while loading (CLS = 0). */
 const SIZES: Record<Props["variant"], string> = {
-  leaderboard: "h-[90px] md:h-[90px]",
+  // Hidden on phones: an empty 90px box pushes the news below the first screen.
+  leaderboard: "hidden md:flex h-[90px]",
   "in-article": "h-[250px]",
   sidebar: "h-[600px]",
   footer: "h-[60px]",
