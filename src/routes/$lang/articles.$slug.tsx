@@ -163,7 +163,7 @@ function ArticlePage() {
           rel="nofollow noopener noreferrer"
           className="mt-8 inline-block border border-border px-4 py-2.5 text-sm font-semibold text-muted-foreground transition-colors hover:border-primary hover:text-primary"
         >
-          {dict.readOriginal} ↗
+          {dict.readOriginal}
         </a>
 
         <p className="mt-4 border-s-2 border-border ps-3 text-xs text-muted-foreground">
