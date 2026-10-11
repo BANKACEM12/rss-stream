@@ -1,4 +1,4 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute, notFound, redirect } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 
 import { AdSlot } from "@/components/news/AdSlot";
@@ -26,6 +26,15 @@ export const Route = createFileRoute("/$lang/articles/$slug")({
       articleQuery(safeLang(params.lang), params.slug),
     );
     if (!data) throw notFound();
+    // A story lives under its own language only (e.g. a Chinese story under /en):
+    // send visitors and Google to the correct address with a permanent redirect.
+    if (data.article.lang !== params.lang && (LANGS as readonly string[]).includes(data.article.lang)) {
+      throw redirect({
+        to: "/$lang/articles/$slug",
+        params: { lang: data.article.lang, slug: data.article.slug },
+        statusCode: 301,
+      });
+    }
     return data;
   },
   head: ({ params, loaderData }) => {

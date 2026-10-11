@@ -5,7 +5,9 @@ import { cn } from "@/lib/utils";
 
 function LanguageSwitcher({ lang }: { lang: Lang }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const rest = pathname.replace(/^\/(ar|en|zh)/, "");
+  const stripped = pathname.replace(/^\/(ar|en|zh)/, "");
+  // Stories exist in one language only, so from a story go to the other language's home page.
+  const rest = stripped.startsWith("/articles/") ? "" : stripped;
 
   return (
     <div className="flex items-center gap-1 text-xs">
