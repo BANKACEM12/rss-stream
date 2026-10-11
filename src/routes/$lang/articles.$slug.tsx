@@ -154,11 +154,14 @@ function ArticlePage() {
           />
         ) : null}
 
+        {/* Keep readers on the site first: related stories come before the exit link. */}
+        <RelatedStories articles={related} lang={lang} />
+
         <a
           href={article.link}
           target="_blank"
           rel="nofollow noopener noreferrer"
-          className="mt-6 inline-block border border-primary bg-primary px-5 py-3 text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90"
+          className="mt-8 inline-block border border-border px-4 py-2.5 text-sm font-semibold text-muted-foreground transition-colors hover:border-primary hover:text-primary"
         >
           {dict.readOriginal}
         </a>
@@ -167,7 +170,7 @@ function ArticlePage() {
           {dict.footer.disclaimer}
         </p>
 
-        <AdSlot label={dict.advertisement} variant="in-article" className="mt-8" />
+        <AdSlot label={dict.advertisement} variant="in-article" className="mt-8 hidden md:flex" />
 
         {article.keywords.length ? (
           <ul className="mt-8 flex flex-wrap gap-2">
@@ -181,8 +184,6 @@ function ArticlePage() {
             ))}
           </ul>
         ) : null}
-
-        <RelatedStories articles={related} lang={lang} />
       </article>
 
       <aside className="space-y-6">
