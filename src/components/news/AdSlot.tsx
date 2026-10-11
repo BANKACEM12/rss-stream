@@ -10,9 +10,9 @@ type Props = {
 const SIZES: Record<Props["variant"], string> = {
   // Hidden on phones: an empty 90px box pushes the news below the first screen.
   leaderboard: "hidden md:flex h-[90px]",
-  "in-article": "h-[250px]",
+  "in-article": "hidden md:flex h-[250px]",
   sidebar: "h-[600px]",
-  footer: "h-[60px]",
+  footer: "hidden md:flex h-[60px]",
 };
 
 export function AdSlot({ label, variant, className }: Props) {
