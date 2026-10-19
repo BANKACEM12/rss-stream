@@ -1,31 +1,40 @@
 /**
  * Static news ingest — no database, no backend services.
  *
- * Fetches all RSS feeds, dedupes against the previous run, and writes
- * src/data/articles.json which the app bundles at build time.
+ * Design: PERMANENT archive, nothing is ever deleted (old article URLs
+ * keep working forever for SEO).
+ *
+ * - src/data/articles.json          HOT: last 60 days (cap 4000), for
+ *                                   homepage / categories / sitemaps.
+ * - src/data/archive/YYYY-MM.json   Monthly shards, append-only. Every
+ *                                   article ever ingested lives here.
+ * - src/data/archive-index.json     { slug: "YYYY-MM" } for archive lookups.
+ * - src/data/meta.json              Run stats.
  *
  * Run:  node scripts/ingest.mjs
- * It is also wired as `prebuild` in package.json and runs every 30 minutes
- * via .github/workflows/refresh-news.yml (commit + push triggers a Lovable redeploy).
+ * Wired as `prebuild` in package.json and every 30 minutes via
+ * .github/workflows/refresh-news.yml.
  */
 
-import { mkdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync, existsSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const DATA_DIR = join(ROOT, "src", "data");
+const ARCHIVE_DIR = join(DATA_DIR, "archive");
 const ARTICLES_PATH = join(DATA_DIR, "articles.json");
+const INDEX_PATH = join(DATA_DIR, "archive-index.json");
 const META_PATH = join(DATA_DIR, "meta.json");
 
-const MAX_ARTICLES = 1200;
-const MAX_AGE_DAYS = 45;
+const HOT_DAYS = 60;
+const HOT_MAX = 4000;
 const FEED_TIMEOUT_MS = 12_000;
 const CONCURRENCY = 6;
 const ITEMS_PER_FEED = 15;
 
 /* ------------------------------------------------------------------ */
-/* Feed list (mirrors src/lib/sources.ts — the app no longer needs it) */
+/* Feed list (mirrors the old src/lib/sources.ts)                      */
 /* ------------------------------------------------------------------ */
 
 /** @type {{url:string,source:string,siteUrl:string,lang:string,category:string}[]} */
@@ -66,7 +75,7 @@ const FEEDS = [
 ];
 
 /* ------------------------------------------------------------------ */
-/* Helpers (ported from src/lib/rss.server.ts + src/lib/keywords.ts)   */
+/* Helpers (RSS parser + keywords, zero dependencies)                   */
 /* ------------------------------------------------------------------ */
 
 function decodeEntities(input) {
@@ -201,6 +210,66 @@ function excerpt(text, max = 200) {
 }
 
 /* ------------------------------------------------------------------ */
+/* Storage: hot file + monthly archive shards + slug index              */
+/* ------------------------------------------------------------------ */
+
+function loadJson(path, fallback) {
+  if (!existsSync(path)) return fallback;
+  try {
+    return JSON.parse(readFileSync(path, "utf8"));
+  } catch {
+    return fallback;
+  }
+}
+
+function monthKey(iso) {
+  return iso.slice(0, 7); // "2026-10"
+}
+
+function shardPath(month) {
+  return join(ARCHIVE_DIR, `${month}.json`);
+}
+
+/** In-memory shard cache for this run: month -> { rows, guids:Set, dirty } */
+const shardCache = new Map();
+
+function getShard(month) {
+  let shard = shardCache.get(month);
+  if (!shard) {
+    const rows = loadJson(shardPath(month), []);
+    shard = { rows, guids: new Set(rows.map((a) => a.guid)), dirty: false };
+    shardCache.set(month, shard);
+  }
+  return shard;
+}
+
+/**
+ * Permanently archive an article. Returns true if it was new.
+ * NEVER deletes — every article ever ingested stays in its month shard.
+ */
+function archiveArticle(article, index) {
+  const month = monthKey(article.published_at);
+  const shard = getShard(month);
+  if (shard.guids.has(article.guid)) return false;
+  shard.rows.push(article);
+  shard.guids.add(article.guid);
+  shard.dirty = true;
+  index[article.slug] = month;
+  return true;
+}
+
+function flushShards() {
+  let count = 0;
+  for (const [month, shard] of shardCache) {
+    if (!shard.dirty) continue;
+    shard.rows.sort((a, b) => (a.published_at < b.published_at ? 1 : -1));
+    writeFileSync(shardPath(month), JSON.stringify(shard.rows));
+    count++;
+  }
+  return count;
+}
+
+/* ------------------------------------------------------------------ */
 /* Ingest                                                              */
 /* ------------------------------------------------------------------ */
 
@@ -233,21 +302,45 @@ async function runWithConcurrency(items, limit, fn) {
   return results;
 }
 
-function loadExisting() {
-  if (!existsSync(ARTICLES_PATH)) return [];
-  try {
-    const parsed = JSON.parse(readFileSync(ARTICLES_PATH, "utf8"));
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
+function buildArticle(feed, item) {
+  const guid = `${feed.lang}:${hash(item.guid || item.link)}`;
+  const summary = excerpt(item.description || item.title, 200);
+  return {
+    id: guid,
+    guid,
+    slug: slugify(item.title, hash(guid)),
+    title: excerpt(item.title, 180),
+    summary,
+    link: item.link,
+    source_name: feed.source,
+    source_url: feed.siteUrl,
+    lang: feed.lang,
+    category: feed.category,
+    image_url: item.image,
+    keywords: extractKeywords(`${item.title} ${summary}`),
+    published_at: toIso(item.pubDate),
+    body: null,
+    body_generated_at: null,
+  };
 }
 
 async function main() {
-  mkdirSync(DATA_DIR, { recursive: true });
-  const existing = loadExisting();
-  const seen = new Set(existing.map((a) => a.guid));
-  const cutoff = Date.now() - MAX_AGE_DAYS * 86_400_000;
+  mkdirSync(ARCHIVE_DIR, { recursive: true });
+
+  // Load current state.
+  const hot = loadJson(ARTICLES_PATH, []);
+  const index = loadJson(INDEX_PATH, {});
+  const hotGuids = new Set(hot.map((a) => a.guid));
+
+  // Migration: make sure every existing hot article is archived + indexed.
+  // (One-time for data created before the archive existed.)
+  let migrated = 0;
+  for (const article of hot) {
+    if (archiveArticle(article, index)) migrated++;
+    else if (!index[article.slug]) {
+      index[article.slug] = monthKey(article.published_at);
+    }
+  }
 
   console.log(`[ingest] fetching ${FEEDS.length} feeds (concurrency ${CONCURRENCY})…`);
   const results = await runWithConcurrency(FEEDS, CONCURRENCY, fetchFeed);
@@ -266,48 +359,34 @@ async function main() {
     for (const item of result.value) {
       if (item.title.length <= 8) continue;
       fetched++;
-      const guid = `${feed.lang}:${hash(item.guid || item.link)}`;
-      if (seen.has(guid)) continue;
-      seen.add(guid);
-      const summary = excerpt(item.description || item.title, 200);
-      fresh.push({
-        id: guid,
-        guid,
-        slug: slugify(item.title, hash(guid)),
-        title: excerpt(item.title, 180),
-        summary,
-        link: item.link,
-        source_name: feed.source,
-        source_url: feed.siteUrl,
-        lang: feed.lang,
-        category: feed.category,
-        image_url: item.image,
-        keywords: extractKeywords(`${item.title} ${summary}`),
-        published_at: toIso(item.pubDate),
-        body: null,
-        body_generated_at: null,
-      });
-      added++;
+      const article = buildArticle(feed, item);
+      if (hotGuids.has(article.guid)) continue;
+      hotGuids.add(article.guid);
+      if (archiveArticle(article, index)) added++;
+      fresh.push(article);
     }
   });
 
-  // Merge: fresh first, then existing; drop stale, cap total.
-  const merged = [...fresh, ...existing]
+  // Rebuild hot: last HOT_DAYS, cap HOT_MAX. Old articles stay in shards.
+  const cutoff = Date.now() - HOT_DAYS * 86_400_000;
+  const newHot = [...fresh, ...hot]
     .filter((a) => new Date(a.published_at).getTime() >= cutoff)
     .sort((a, b) => (a.published_at < b.published_at ? 1 : -1))
-    .slice(0, MAX_ARTICLES);
+    .slice(0, HOT_MAX);
 
-  if (merged.length === 0) {
-    // Never deploy a build that would wipe the site: keep old data if the
-    // network failed everywhere, or write an empty set on first run.
-    console.warn("[ingest] WARNING: no articles available after fetch.");
-    if (existing.length > 0) {
-      console.warn("[ingest] keeping previous articles.json untouched.");
-      return;
-    }
-    writeFileSync(ARTICLES_PATH, "[]");
+  const shardsWritten = flushShards();
+
+  if (newHot.length === 0 && hot.length > 0) {
+    console.warn("[ingest] WARNING: fetch yielded nothing usable; keeping previous hot file.");
   } else {
-    writeFileSync(ARTICLES_PATH, JSON.stringify(merged));
+    writeFileSync(ARTICLES_PATH, JSON.stringify(newHot));
+  }
+  writeFileSync(INDEX_PATH, JSON.stringify(index));
+
+  // Archive stats.
+  let archivedTotal = 0;
+  for (const f of readdirSync(ARCHIVE_DIR)) {
+    if (f.endsWith(".json")) archivedTotal += loadJson(join(ARCHIVE_DIR, f), []).length;
   }
 
   writeFileSync(
@@ -315,9 +394,13 @@ async function main() {
     JSON.stringify(
       {
         generated_at: new Date().toISOString(),
-        count: merged.length,
+        hot_count: newHot.length,
+        archived_total: archivedTotal,
+        index_size: Object.keys(index).length,
         added,
+        migrated,
         fetched,
+        shards_written: shardsWritten,
         feeds_ok: results.filter((r) => r.ok).length,
         feeds_failed: failures,
       },
@@ -327,7 +410,8 @@ async function main() {
   );
 
   console.log(
-    `[ingest] done: ${added} new, ${merged.length} total, ` +
+    `[ingest] done: ${added} new (+${migrated} migrated), hot=${newHot.length}, ` +
+      `archived=${archivedTotal}, shards_written=${shardsWritten}, ` +
       `${results.filter((r) => r.ok).length}/${FEEDS.length} feeds ok`
   );
   if (failures.length) console.warn("[ingest] failures:\n - " + failures.join("\n - "));
