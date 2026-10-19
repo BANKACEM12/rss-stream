@@ -11,7 +11,10 @@ type Props = {
   eager?: boolean;
   /** Shown when `src` fails to load (or is too small) instead of an empty box. */
   fallbackSrc?: string;
-  /** Minimum natural width in px; smaller images fall back (avoids blurry upscales). */
+  /** Minimum natural width in px; smaller images fall back (avoids blurry upscales).
+   *  Kept UNIFORM across cards/heroes/thumbs: per-placement thresholds made
+   *  the same article show its real photo on the card but the generated
+   *  image on the article page. */
   minWidth?: number;
 };
 
@@ -38,7 +41,7 @@ export function EditorialImage({
   className,
   eager = false,
   fallbackSrc,
-  minWidth = 320,
+  minWidth = 500,
 }: Props) {
   const [hidden, setHidden] = useState(false);
   const [currentSrc, setCurrentSrc] = useState(() => highResolutionUrl(src));

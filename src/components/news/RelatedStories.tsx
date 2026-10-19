@@ -31,7 +31,6 @@ export function RelatedStories({ articles, lang }: { articles: Article[]; lang: 
                 alt={item.title}
                 width={192}
                 height={128}
-                minWidth={180}
                 className="aspect-[3/2] w-24 shrink-0 object-cover"
               />
             </Link>
