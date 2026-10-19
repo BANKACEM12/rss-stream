@@ -195,16 +195,80 @@
   }
 }
 
+/* Solid "breaking" chip with a pulsing gold dot — editorial urgency, premium feel. */
+@utility breaking-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--color-crimson);
+  color: var(--color-crimson-foreground);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.35rem 0.8rem;
+
+  &::before {
+    content: "";
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background-color: var(--color-gold);
+    animation: breaking-pulse 1.6s ease-in-out infinite;
+  }
+}
+
+@keyframes breaking-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.8);
+  }
+}
+
+/* Classic newspaper drop cap for the article lead paragraph (RTL-aware). */
+@utility drop-cap {
+  &::first-letter {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 3.1em;
+    line-height: 0.85;
+    float: inline-start;
+    margin-inline-end: 0.14em;
+    margin-top: 0.08em;
+    color: var(--color-crimson);
+  }
+}
+
+/* Short centered gold divider — masthead ornament, section accents. */
+@utility gold-rule {
+  display: block;
+  width: 3rem;
+  height: 2px;
+  margin-inline: auto;
+  background-color: var(--color-gold);
+}
+
 @utility ad-slot {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px dashed var(--color-rule);
-  background-color: var(--color-muted);
+  border: 1px dotted var(--color-rule);
+  background-color: transparent;
   color: var(--color-muted-foreground);
-  font-size: 0.7rem;
-  letter-spacing: 0.08em;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
+  opacity: 0.75;
+}
+
+::selection {
+  background-color: var(--color-crimson);
+  color: var(--color-crimson-foreground);
 }
 
 /* AI-written article body (sanitized HTML rendered via dangerouslySetInnerHTML). */

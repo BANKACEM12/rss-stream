@@ -56,11 +56,12 @@ export function SiteHeader({ lang }: { lang: Lang }) {
 
       <div className="mx-auto hidden max-w-6xl border-y border-border px-4 py-9 text-center md:block">
         <Link to="/$lang" params={{ lang }} className="inline-block">
-          <span className="block font-display text-[2rem] font-black leading-tight md:text-6xl">
+          <span className="block font-display text-[2rem] font-black leading-tight tracking-tight md:text-6xl">
             {dict.siteName}
           </span>
         </Link>
-        <p className="mx-auto mt-2 max-w-xl text-xs text-muted-foreground md:text-sm">{dict.tagline}</p>
+        <span className="gold-rule mt-4" aria-hidden="true" />
+        <p className="mx-auto mt-3 max-w-xl text-xs tracking-wide text-muted-foreground md:text-sm">{dict.tagline}</p>
       </div>
 
       <nav className="sticky top-0 z-20 -mx-0 border-b border-border bg-card/95 backdrop-blur-sm">
@@ -97,7 +98,7 @@ export function SiteHeader({ lang }: { lang: Lang }) {
 export function SiteFooter({ lang }: { lang: Lang }) {
   const dict = DICT[lang];
   return (
-    <footer className="mt-12 border-t border-border bg-card">
+    <footer className="mt-12 border-t-2 border-t-gold/70 bg-card">
       <div className="mx-auto max-w-6xl px-4 py-10">
         <p className="font-display text-xl font-bold">{dict.siteName}</p>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{dict.footer.disclaimer}</p>

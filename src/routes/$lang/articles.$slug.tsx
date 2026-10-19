@@ -158,7 +158,7 @@ function ArticlePage() {
           className="mt-6 aspect-[16/9] w-full object-cover"
         />
 
-        <p className="mt-6 text-lg leading-relaxed">{article.summary}</p>
+        <p className="drop-cap mt-6 text-lg leading-relaxed">{article.summary}</p>
 
         {article.body ? (
           <div

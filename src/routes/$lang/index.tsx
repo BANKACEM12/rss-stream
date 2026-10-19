@@ -108,8 +108,8 @@ function HomePage() {
         <>
            <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_300px]">
             <div>
-              <p className="kicker">{dict.breaking}</p>
-              {lead ? <NewsCard article={lead} lang={lang} variant="lead" className="mt-2" /> : null}
+              <p className="breaking-chip">{dict.breaking}</p>
+              {lead ? <NewsCard article={lead} lang={lang} variant="lead" className="mt-3" /> : null}
 
               <div className="mt-10 grid gap-x-7 gap-y-8 sm:grid-cols-2">
                 {rest.slice(0, 6).map((item) => (

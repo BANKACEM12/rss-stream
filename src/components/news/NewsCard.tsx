@@ -90,7 +90,7 @@ export function NewsCard({ article, lang, variant = "standard", className }: Pro
         </p>
       ) : null}
 
-      <p className="mt-3 text-xs text-muted-foreground">
+      <p className="mt-3 text-xs tabular-nums text-muted-foreground">
         <span className="font-semibold text-foreground">{article.source_name}</span> ·{" "}
         <time dateTime={article.published_at}>{formatDate(article.published_at, lang)}</time>
       </p>
