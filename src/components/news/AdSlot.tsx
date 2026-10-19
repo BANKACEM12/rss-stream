@@ -6,7 +6,13 @@ type Props = {
   className?: string;
 };
 
-/** Fixed-height ad placeholders so nothing shifts while loading (CLS = 0). */
+/** Fixed-height ad placeholders so nothing shifts while loading (CLS = 0).
+ *
+ * INTENTIONALLY UNUSED until Google AdSense approves the site — empty
+ * "advertisement" boxes hurt the professional look and the review.
+ * Re-add <AdSlot> usages (homepage, category, article, layout, static
+ * pages) once AdSense issues real ad units.
+ */
 const SIZES: Record<Props["variant"], string> = {
   // Hidden on phones: an empty 90px box pushes the news below the first screen.
   leaderboard: "hidden md:flex h-[90px]",

@@ -1,4 +1,3 @@
-import { AdSlot } from "@/components/news/AdSlot";
 import { DICT, LANGS, type Lang } from "@/lib/i18n";
 
 export type StaticKey = "about" | "contact" | "privacy" | "terms" | "editorial";
@@ -33,7 +32,7 @@ export function StaticPage({
 }) {
   const page = DICT[lang].pages[pageKey];
   return (
-    <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
+    <div>
       <article className="max-w-3xl">
         <h1 className="rule-double pt-3 font-display text-3xl font-black">{page.title}</h1>
         <p className="mt-4 text-lg text-muted-foreground">{page.intro}</p>
@@ -44,9 +43,6 @@ export function StaticPage({
         </div>
         {children}
       </article>
-      <aside>
-        <AdSlot label={DICT[lang].advertisement} variant="sidebar" />
-      </aside>
     </div>
   );
 }

@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 
-import { AdSlot } from "@/components/news/AdSlot";
 import { GlobalScoreBox } from "@/components/news/GlobalScoreBox";
 import { NewsCard } from "@/components/news/NewsCard";
 import { listHomeArticles } from "@/lib/news.functions";
@@ -116,8 +115,6 @@ function HomePage() {
                   <NewsCard key={item.id} article={item} lang={lang} />
                 ))}
               </div>
-
-              <AdSlot label={dict.advertisement} variant="in-article" className="mt-8" />
             </div>
 
             <aside className="space-y-6">
@@ -130,7 +127,6 @@ function HomePage() {
                 </div>
               </section>
               <GlobalScoreBox lang={lang} />
-              <AdSlot label={dict.advertisement} variant="sidebar" className="hidden lg:flex" />
             </aside>
           </div>
 

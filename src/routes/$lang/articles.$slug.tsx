@@ -1,7 +1,6 @@
 import { createFileRoute, notFound, redirect } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 
-import { AdSlot } from "@/components/news/AdSlot";
 import { EditorialImage } from "@/components/news/EditorialImage";
 import { GlobalScoreBox } from "@/components/news/GlobalScoreBox";
 import { RelatedStories } from "@/components/news/RelatedStories";
@@ -192,8 +191,6 @@ function ArticlePage() {
           {dict.footer.disclaimer}
         </p>
 
-        <AdSlot label={dict.advertisement} variant="in-article" className="mt-8 hidden md:flex" />
-
         {article.keywords.length ? (
           <ul className="mt-8 flex flex-wrap gap-2">
             {article.keywords.map((keyword) => (
@@ -210,7 +207,6 @@ function ArticlePage() {
 
       <aside className="space-y-6">
         {article.category === "sports" ? <GlobalScoreBox lang={lang} /> : null}
-        <AdSlot label={dict.advertisement} variant="sidebar" className="hidden lg:flex" />
       </aside>
     </div>
   );

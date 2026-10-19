@@ -1,7 +1,6 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 
-import { AdSlot } from "@/components/news/AdSlot";
 import { GlobalScoreBox } from "@/components/news/GlobalScoreBox";
 import { NewsCard } from "@/components/news/NewsCard";
 import { listCategoryArticles } from "@/lib/news.functions";
@@ -111,8 +110,7 @@ function CategoryPage() {
                 <NewsCard key={item.id} article={item} lang={lang} />
               ))}
             </div>
-            <AdSlot label={dict.advertisement} variant="in-article" className="my-8" />
-            <div className="grid gap-6 sm:grid-cols-2">
+            <div className="mt-8 grid gap-6 sm:grid-cols-2">
               {articles.slice(6).map((item) => (
                 <NewsCard key={item.id} article={item} lang={lang} />
               ))}
@@ -123,7 +121,6 @@ function CategoryPage() {
 
       <aside className="space-y-6">
         {category === "sports" ? <GlobalScoreBox lang={lang} /> : null}
-        <AdSlot label={dict.advertisement} variant="sidebar" className="hidden lg:flex" />
       </aside>
     </div>
   );
