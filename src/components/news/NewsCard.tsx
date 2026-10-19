@@ -56,6 +56,7 @@ export function NewsCard({ article, lang, variant = "standard", className }: Pro
           width={isLead ? 1200 : 640}
           height={isLead ? 675 : 360}
           eager={isLead}
+          minWidth={isLead ? 700 : 420}
           className={cn(
             "aspect-[16/9] w-full transition-transform duration-500 group-hover:scale-[1.015]",
           )}

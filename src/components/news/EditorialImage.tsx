@@ -11,6 +11,8 @@ type Props = {
   eager?: boolean;
   /** Shown when `src` fails to load (or is too small) instead of an empty box. */
   fallbackSrc?: string;
+  /** Minimum natural width in px; smaller images fall back (avoids blurry upscales). */
+  minWidth?: number;
 };
 
 function highResolutionUrl(src: string) {
@@ -28,7 +30,16 @@ function highResolutionUrl(src: string) {
   }
 }
 
-export function EditorialImage({ src, alt, width, height, className, eager = false, fallbackSrc }: Props) {
+export function EditorialImage({
+  src,
+  alt,
+  width,
+  height,
+  className,
+  eager = false,
+  fallbackSrc,
+  minWidth = 320,
+}: Props) {
   const [hidden, setHidden] = useState(false);
   const [currentSrc, setCurrentSrc] = useState(() => highResolutionUrl(src));
   if (hidden) return null;
@@ -46,7 +57,11 @@ export function EditorialImage({ src, alt, width, height, className, eager = fal
 
   const checkQuality = (event: SyntheticEvent<HTMLImageElement>) => {
     const image = event.currentTarget;
-    if (image.naturalWidth < 320 || image.naturalHeight < 180) useFallback();
+    // Reject images too small for their display size (would look blurry),
+    // and broken-aspect images. Fallback covers them.
+    if (image.naturalWidth < minWidth || image.naturalHeight < Math.round(minWidth / 2.4)) {
+      useFallback();
+    }
   };
 
   return (
@@ -58,6 +73,7 @@ export function EditorialImage({ src, alt, width, height, className, eager = fal
       loading={eager ? "eager" : "lazy"}
       fetchPriority={eager ? "high" : "auto"}
       decoding="async"
+      referrerPolicy="no-referrer"
       onLoad={checkQuality}
       onError={useFallback}
       className={cn("bg-secondary object-cover", className)}

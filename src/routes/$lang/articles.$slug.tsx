@@ -163,6 +163,7 @@ function ArticlePage() {
           width={1200}
           height={675}
           eager
+          minWidth={700}
           className="mt-6 aspect-[16/9] w-full object-cover"
         />
 
