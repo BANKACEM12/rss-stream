@@ -1,23 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { LANGS, type Lang } from "@/lib/i18n";
-import { locUrl, publicDb, siteOrigin, xmlEscape, xmlResponse } from "@/lib/sitemap.server";
+import { listSitemapEntries } from "@/lib/news.functions";
+import { locUrl, siteOrigin, xmlEscape, xmlResponse } from "@/lib/sitemap.server";
 
 export const Route = createFileRoute("/sitemap-articles.xml")({
   server: {
     handlers: {
       GET: async ({ request }) => {
         const base = siteOrigin(request);
-        const db = await publicDb();
 
-        const { data } = await db
-          .from("articles")
-          .select("slug, lang, title, published_at, image_url")
-          .order("published_at", { ascending: false })
-          .limit(5000);
-
-        const rows = (data ?? []).filter((row) =>
-          (LANGS as readonly string[]).includes(row.lang as string),
+        const rows = (await listSitemapEntries()).filter((row) =>
+          (LANGS as readonly string[]).includes(row.lang),
         );
 
         const entries = rows.map((row) => {

@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { DICT, LANGS, type Lang } from "@/lib/i18n";
-import { locUrl, publicDb, siteOrigin, xmlEscape, xmlResponse } from "@/lib/sitemap.server";
+import { listSitemapEntries } from "@/lib/news.functions";
+import { locUrl, siteOrigin, xmlEscape, xmlResponse } from "@/lib/sitemap.server";
 
 const NEWS_LANG: Record<Lang, string> = { ar: "ar", en: "en", zh: "zh-cn" };
 
@@ -10,18 +11,12 @@ export const Route = createFileRoute("/sitemap-news.xml")({
     handlers: {
       GET: async ({ request }) => {
         const base = siteOrigin(request);
-        const db = await publicDb();
-        const since = new Date(Date.now() - 48 * 3600 * 1000).toISOString();
+        const since = Date.now() - 48 * 3600 * 1000;
 
-        const { data } = await db
-          .from("articles")
-          .select("slug, lang, title, published_at, image_url")
-          .gte("published_at", since)
-          .order("published_at", { ascending: false })
-          .limit(1000);
-
-        const rows = (data ?? []).filter((row) =>
-          (LANGS as readonly string[]).includes(row.lang as string),
+        const rows = (await listSitemapEntries()).filter(
+          (row) =>
+            (LANGS as readonly string[]).includes(row.lang) &&
+            new Date(row.published_at).getTime() >= since,
         );
 
         const entries = rows.map((row) => {

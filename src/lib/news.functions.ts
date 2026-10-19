@@ -1,11 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
-import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 
 import { CATEGORIES, LANGS } from "./i18n";
+import articlesJson from "../data/articles.json";
 
 export type Article = {
   id: string;
+  guid: string;
   slug: string;
   title: string;
   summary: string | null;
@@ -21,25 +22,15 @@ export type Article = {
   body_generated_at: string | null;
 };
 
-const SELECT =
-  "id, slug, title, summary, link, source_name, source_url, lang, category, image_url, keywords, published_at, body, body_generated_at";
+/**
+ * Static data layer — articles are ingested at build time by
+ * `node scripts/ingest.mjs` into src/data/articles.json and bundled
+ * with the app. No database, no backend services.
+ */
+const ARTICLES = articlesJson as Article[];
 
-function publicClient() {
-  const key = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
-  return createClient(process.env["SUPABASE_URL"]!, key, {
-    auth: { persistSession: false, autoRefreshToken: false },
-    global: {
-      fetch: (input: RequestInfo | URL, init?: RequestInit) => {
-        const headers = new Headers(init?.headers);
-        if (key.startsWith("sb_") && headers.get("Authorization") === `Bearer ${key}`) {
-          headers.delete("Authorization");
-        }
-        headers.set("apikey", key);
-        return fetch(input, { ...init, headers });
-      },
-    },
-  });
-}
+const byNewest = (rows: Article[]): Article[] =>
+  [...rows].sort((a, b) => (a.published_at < b.published_at ? 1 : -1));
 
 const langSchema = z.enum(LANGS);
 const categorySchema = z.enum(CATEGORIES);
@@ -47,16 +38,8 @@ const categorySchema = z.enum(CATEGORIES);
 export const listHomeArticles = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) => z.object({ lang: langSchema }).parse(input))
   .handler(async ({ data }) => {
-    const db = publicClient();
-    const { data: latest, error } = await db
-      .from("articles")
-      .select(SELECT)
-      .eq("lang", data.lang)
-      .order("published_at", { ascending: false })
-      .limit(60);
-    if (error) throw new Error(error.message);
+    const rows = byNewest(ARTICLES.filter((a) => a.lang === data.lang)).slice(0, 60);
 
-    const rows = (latest ?? []) as Article[];
     const byCategory: Record<string, Article[]> = {};
     for (const row of rows) {
       (byCategory[row.category] ??= []).push(row);
@@ -69,16 +52,9 @@ export const listCategoryArticles = createServerFn({ method: "GET" })
     z.object({ lang: langSchema, category: categorySchema }).parse(input),
   )
   .handler(async ({ data }) => {
-    const db = publicClient();
-    const { data: rows, error } = await db
-      .from("articles")
-      .select(SELECT)
-      .eq("lang", data.lang)
-      .eq("category", data.category)
-      .order("published_at", { ascending: false })
-      .limit(48);
-    if (error) throw new Error(error.message);
-    return (rows ?? []) as Article[];
+    return byNewest(
+      ARTICLES.filter((a) => a.lang === data.lang && a.category === data.category),
+    ).slice(0, 48);
   });
 
 export const getArticle = createServerFn({ method: "GET" })
@@ -86,35 +62,26 @@ export const getArticle = createServerFn({ method: "GET" })
     z.object({ lang: langSchema, slug: z.string().min(1) }).parse(input),
   )
   .handler(async ({ data }) => {
-    const db = publicClient();
-    const { data: article, error } = await db
-      .from("articles")
-      .select(SELECT)
-      .eq("slug", data.slug)
-      .maybeSingle();
-    if (error) throw new Error(error.message);
+    const article = ARTICLES.find((a) => a.slug === data.slug) ?? null;
     if (!article) return null;
 
-    const typed = article as Article;
-    const { data: related } = await db
-      .from("articles")
-      .select(SELECT)
-      .eq("lang", typed.lang)
-      .eq("category", typed.category)
-      .neq("id", typed.id)
-      .order("published_at", { ascending: false })
-      .limit(6);
+    const related = byNewest(
+      ARTICLES.filter(
+        (a) => a.lang === article.lang && a.category === article.category && a.id !== article.id,
+      ),
+    ).slice(0, 6);
 
-    return { article: typed, related: (related ?? []) as Article[] };
+    return { article, related };
   });
 
 export const listSitemapEntries = createServerFn({ method: "GET" }).handler(async () => {
-  const db = publicClient();
-  const { data, error } = await db
-    .from("articles")
-    .select("slug, lang, published_at")
-    .order("published_at", { ascending: false })
-    .limit(1000);
-  if (error) throw new Error(error.message);
-  return (data ?? []) as { slug: string; lang: string; published_at: string }[];
+  return byNewest(ARTICLES)
+    .slice(0, 5000)
+    .map((a) => ({
+      slug: a.slug,
+      lang: a.lang,
+      title: a.title,
+      image_url: a.image_url,
+      published_at: a.published_at,
+    }));
 });

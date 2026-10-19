@@ -1,5 +1,13 @@
 # News Pulse
 
+> **Architecture (Oct 2026): fully static — no Supabase, no Lovable Cloud.**
+> News are ingested at build time by `node scripts/ingest.mjs` into
+> `src/data/articles.json` (bundled with the app). The `prebuild` npm script
+> refreshes the news on every deploy, and `.github/workflows/refresh-news.yml`
+> re-ingests every 30 minutes, commits the JSON, and pushes — which triggers a
+> Lovable redeploy. Hosting: `rss-stream.lovable.app` subdomain only.
+> GitHub is the single source of truth.
+
 # شرح كامل بالعربية — بناء موقع أخبار احترافي متعدد الفئات بتكلفة صفر
 
 سأشرح لك المشروع من الألف إلى الياء بالعربية، خطوة بخطوة، حتى تفهم كل جزء قبل ما تنسخ الكود.
