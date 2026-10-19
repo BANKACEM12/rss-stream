@@ -190,19 +190,6 @@ function ArticlePage() {
         <p className="mt-4 border-s-2 border-border ps-3 text-xs text-muted-foreground">
           {dict.footer.disclaimer}
         </p>
-
-        {article.keywords.length ? (
-          <ul className="mt-8 flex flex-wrap gap-2">
-            {article.keywords.map((keyword) => (
-              <li
-                key={keyword}
-                className="border border-border bg-secondary px-2 py-1 text-xs text-muted-foreground"
-              >
-                #{keyword}
-              </li>
-            ))}
-          </ul>
-        ) : null}
       </article>
 
       <aside className="space-y-6">

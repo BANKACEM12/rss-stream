@@ -106,7 +106,7 @@ export function ShareButtons({ lang, slug, title, className }: Props) {
         className="flex h-9 items-center gap-1.5 border border-border px-3 text-sm font-semibold text-muted-foreground transition-colors hover:border-primary hover:text-primary"
       >
         <LinkIcon />
-        {copied ? dict.copied : "URL"}
+        {copied ? dict.copied : dict.copyLink}
       </button>
     </div>
   );

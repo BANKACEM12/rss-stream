@@ -80,7 +80,21 @@ function isArticleArray(value: unknown): value is Article[] {
 
 async function getHot(): Promise<Article[]> {
   const data = await fetchJson(HOT_URL, HOT_TTL_MS);
-  return isArticleArray(data) ? data : FALLBACK;
+  return isArticleArray(data) ? dedupeByTitle(data) : FALLBACK;
+}
+
+/** Drop near-duplicate stories (same headline republished by another feed). */
+function dedupeByTitle(rows: Article[]): Article[] {
+  const seen = new Set<string>();
+  return rows.filter((a) => {
+    const key = a.title
+      .toLowerCase()
+      .replace(/[\p{P}\p{S}\p{Z}\s_،؛؟！…"“”'']/gu, "")
+      .replace(/[ً-ٰٟ]/g, "");
+    if (!key || seen.has(key)) return !key ? true : false;
+    seen.add(key);
+    return true;
+  });
 }
 
 async function getIndex(): Promise<Record<string, string>> {
