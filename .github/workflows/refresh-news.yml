@@ -23,6 +23,8 @@ jobs:
           node-version: 22
 
       - name: Ingest RSS feeds
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: node scripts/ingest.mjs
 
       - name: Commit and push if changed

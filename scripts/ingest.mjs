@@ -34,6 +34,128 @@ const CONCURRENCY = 6;
 const ITEMS_PER_FEED = 15;
 
 /* ------------------------------------------------------------------ */
+/* AI article expansion (Gemini) — professional bodies for thin feeds   */
+/* ------------------------------------------------------------------ */
+
+const GEMINI_MODEL = "gemini-2.5-flash";
+const GEMINI_DELAY_MS = 4500; // stay well under the free-tier rate limit
+const BACKFILL_PER_RUN = 10;
+
+const LANG_NAMES = { ar: "Arabic", en: "English", zh: "Chinese (Simplified)" };
+
+function expansionPrompt(article) {
+  const langName = LANG_NAMES[article.lang] || "Arabic";
+  return `You are a professional news editor writing for a news aggregator. Expand the brief below into a fuller news article.
+
+ABSOLUTE RULES:
+1. Use ONLY facts explicitly stated in the Title and Summary. NEVER invent names, dates, numbers, statistics, quotes, locations, or events that are not in the source text.
+2. You MAY add one short paragraph of general, well-known background context (for example what a mentioned competition or institution is), but it must stay generic — no specific claims.
+3. If the summary is very short, write a concise 2-3 paragraph piece strictly from what is given. Do NOT pad with invented details.
+4. Write in ${langName}. Clear, objective, professional news tone. Inverted pyramid: the most important fact first.
+5. Structure for readers and search engines: short paragraphs, one idea each, no repetition.
+6. Output ONLY HTML paragraphs: <p>...</p>. No headings, no markdown, no lists, no preamble or explanation.
+7. Length: 120-220 words.
+
+Title: ${article.title}
+Summary: ${article.summary}
+Source: ${article.source_name}
+Category: ${article.category}`;
+}
+
+/** Expand one article's summary into a professional body via Gemini. Returns HTML or null. */
+async function expandWithGemini(article, apiKey) {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(apiKey)}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: expansionPrompt(article) }] }],
+      generationConfig: { temperature: 0.7, maxOutputTokens: 900 },
+    }),
+    signal: AbortSignal.timeout(30_000),
+  });
+  if (!res.ok) {
+    const errText = await res.text().catch(() => "");
+    throw new Error(`Gemini ${res.status}: ${errText.slice(0, 120)}`);
+  }
+  const json = await res.json();
+  const text = json?.candidates?.[0]?.content?.parts?.map((p) => p.text || "").join("") ?? "";
+  const cleaned = text.trim();
+  if (!cleaned || !cleaned.includes("<p>")) return null;
+  return cleaned;
+}
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/** Generate AI bodies for a list of articles missing one. */
+async function expandBodies(articles, apiKey) {
+  if (!apiKey) {
+    console.log("GEMINI_API_KEY not set — skipping AI expansion.");
+    return { generated: 0, failed: 0 };
+  }
+  const queue = articles.filter((a) => !a.body);
+  let generated = 0,
+    failed = 0;
+  for (const article of queue) {
+    try {
+      const body = await expandWithGemini(article, apiKey);
+      if (body) {
+        article.body = body;
+        article.body_generated_at = new Date().toISOString();
+        generated++;
+      } else {
+        failed++;
+      }
+    } catch (e) {
+      console.log(`AI expansion failed for ${article.id}: ${e.message}`);
+      failed++;
+      if (/429|quota|RESOURCE_EXHAUSTED/i.test(e.message)) {
+        console.log("Rate/quota hit — stopping AI expansion for this run.");
+        break;
+      }
+    }
+    await sleep(GEMINI_DELAY_MS);
+  }
+  console.log(`AI expansion: ${generated} generated, ${failed} failed.`);
+  return { generated, failed };
+}
+
+/** Backfill AI bodies for older hot articles missing one (a few per run). */
+async function backfillBodies(hot, index, apiKey) {
+  if (!apiKey) return { generated: 0 };
+  const candidates = hot
+    .filter((a) => !a.body)
+    .sort((a, b) => (a.published_at < b.published_at ? 1 : -1))
+    .slice(0, BACKFILL_PER_RUN);
+  let generated = 0;
+  for (const article of candidates) {
+    try {
+      const body = await expandWithGemini(article, apiKey);
+      if (body) {
+        article.body = body;
+        article.body_generated_at = new Date().toISOString();
+        // Patch the archived copy as well so old URLs stay rich.
+        const month = index[article.slug] || monthKey(article.published_at);
+        const shard = getShard(month);
+        const row = shard.rows.find((r) => r.guid === article.guid);
+        if (row) {
+          row.body = body;
+          row.body_generated_at = article.body_generated_at;
+          shard.dirty = true;
+        }
+        generated++;
+      }
+    } catch (e) {
+      console.log(`AI backfill failed for ${article.id}: ${e.message}`);
+      if (/429|quota|RESOURCE_EXHAUSTED/i.test(e.message)) break;
+    }
+    await sleep(GEMINI_DELAY_MS);
+  }
+  if (generated) console.log(`AI backfill: ${generated} bodies added.`);
+  return { generated };
+}
+
+/* ------------------------------------------------------------------ */
 /* Feed list (mirrors the old src/lib/sources.ts)                      */
 /* ------------------------------------------------------------------ */
 
@@ -427,10 +549,15 @@ async function main() {
       const article = buildArticle(feed, item);
       if (hotGuids.has(article.guid)) continue;
       hotGuids.add(article.guid);
-      if (archiveArticle(article, index)) added++;
       fresh.push(article);
     }
   });
+
+  // AI expansion for fresh articles BEFORE archiving, so shards get bodies too.
+  await expandBodies(fresh, process.env.GEMINI_API_KEY);
+  for (const article of fresh) {
+    if (archiveArticle(article, index)) added++;
+  }
 
   // Rebuild hot: last HOT_DAYS, cap HOT_MAX. Old articles stay in shards.
   const cutoff = Date.now() - HOT_DAYS * 86_400_000;
@@ -438,6 +565,9 @@ async function main() {
     .filter((a) => new Date(a.published_at).getTime() >= cutoff)
     .sort((a, b) => (a.published_at < b.published_at ? 1 : -1))
     .slice(0, HOT_MAX);
+
+  // Backfill bodies for older articles (a few per run).
+  await backfillBodies(newHot, index, process.env.GEMINI_API_KEY);
 
   const shardsWritten = flushShards();
 
