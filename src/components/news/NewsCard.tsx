@@ -50,7 +50,8 @@ export function NewsCard({ article, lang, variant = "standard", className }: Pro
         className="mb-4 block overflow-hidden bg-secondary"
       >
         <EditorialImage
-          src={categoryImage(article.category, article.id)}
+          src={article.image_url ?? categoryImage(article.category, article.id)}
+          fallbackSrc={categoryImage(article.category, article.id)}
           alt={article.title}
           width={isLead ? 1200 : 640}
           height={isLead ? 675 : 360}

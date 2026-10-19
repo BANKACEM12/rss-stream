@@ -26,7 +26,8 @@ export function RelatedStories({ articles, lang }: { articles: Article[]; lang: 
                 </p>
               </div>
               <EditorialImage
-                src={categoryImage(item.category, item.id)}
+                src={item.image_url ?? categoryImage(item.category, item.id)}
+                fallbackSrc={categoryImage(item.category, item.id)}
                 alt={item.title}
                 width={192}
                 height={128}

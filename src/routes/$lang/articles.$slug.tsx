@@ -157,7 +157,8 @@ function ArticlePage() {
         <ShareButtons lang={lang} slug={article.slug} title={article.title} className="mt-4" />
 
         <EditorialImage
-          src={categoryImage(article.category, article.id)}
+          src={article.image_url ?? categoryImage(article.category, article.id)}
+          fallbackSrc={categoryImage(article.category, article.id)}
           alt={article.title}
           width={1200}
           height={675}

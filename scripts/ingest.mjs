@@ -122,6 +122,42 @@ function attr(block, pattern) {
   return match?.[1] ?? null;
 }
 
+/**
+ * Pick the best article image from an RSS item block.
+ * Collects every candidate (media:content/thumbnail, enclosures, inline imgs),
+ * drops junk (logos, avatars, tracking pixels…), and prefers high-resolution.
+ */
+function pickImage(block) {
+  const candidates = [];
+  for (const m of block.matchAll(/<media:(?:content|thumbnail)[^>]*url=["']([^"']+)["']/gi)) {
+    candidates.push({ url: m[1], weight: 3 }); // usually the real article photo
+  }
+  for (const m of block.matchAll(/<enclosure[^>]*url=["']([^"']+)["']/gi)) {
+    candidates.push({ url: m[1], weight: 1 });
+  }
+  for (const m of block.matchAll(/<img[^>]*src=["']([^"']+)["']/gi)) {
+    candidates.push({ url: m[1], weight: 0 });
+  }
+
+  const JUNK = /logo|icon|avatar|gravatar|pixel|spacer|blank|placeholder|sprite|badge|feedburner|feedproxy|stats|track|doubleclick/i;
+  let best = null;
+  let bestScore = -Infinity;
+  for (const { url, weight } of candidates) {
+    if (!url || !url.startsWith("http")) continue;
+    if (JUNK.test(url)) continue;
+    let score = weight;
+    if (/1200|1024|2048|original|large/i.test(url)) score += 3;
+    else if (/800|640|medium/i.test(url)) score += 2;
+    else if (/\/\d{2,3}\/|\b(150|200|250|thumb|small)\b/i.test(url)) score -= 2;
+    if (/\.(jpe?g|png|webp)(\?|$)/i.test(url)) score += 1;
+    if (score > bestScore) {
+      bestScore = score;
+      best = url;
+    }
+  }
+  return best;
+}
+
 /** Minimal RSS 2.0 + Atom parser (no dependencies). */
 function parseFeed(xml) {
   const blocks = [
@@ -140,10 +176,7 @@ function parseFeed(xml) {
 
     const description = tag(block, ["description", "summary", "content:encoded", "content"]) ?? "";
     const pubDate = tag(block, ["pubDate", "published", "updated", "dc:date"]);
-    const image =
-      attr(block, /<media:(?:content|thumbnail)[^>]*url=["']([^"']+)["']/i) ||
-      attr(block, /<enclosure[^>]*url=["']([^"']+\.(?:jpe?g|png|webp)[^"']*)["']/i) ||
-      attr(block, /<img[^>]*src=["']([^"']+)["']/i);
+    const image = pickImage(block);
 
     items.push({
       guid: tag(block, ["guid", "id"]) || link,
