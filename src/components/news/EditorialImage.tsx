@@ -41,7 +41,7 @@ export function EditorialImage({
   className,
   eager = false,
   fallbackSrc,
-  minWidth = 500,
+  minWidth = 400,
 }: Props) {
   const [hidden, setHidden] = useState(false);
   const [currentSrc, setCurrentSrc] = useState(() => highResolutionUrl(src));
