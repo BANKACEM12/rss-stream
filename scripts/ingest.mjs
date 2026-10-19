@@ -43,36 +43,50 @@ const BACKFILL_PER_RUN = 10;
 
 const LANG_NAMES = { ar: "Arabic", en: "English", zh: "Chinese (Simplified)" };
 
-function expansionPrompt(article) {
+function expansionPrompt(article, extraSources = []) {
   const langName = LANG_NAMES[article.lang] || "Arabic";
-  return `You are a professional news editor writing for a news aggregator. Expand the brief below into a fuller news article.
+  const isMulti = extraSources.length > 0;
+
+  const sourceTexts = [
+    `SOURCE 1 (${article.source_name}): ${article.summary}`,
+    ...extraSources.map((s, i) => `SOURCE ${i + 2} (${s.source_name}): ${s.summary}`),
+  ].join("\n\n");
+
+  return `You are a professional news editor writing for a news aggregator. Write a full professional news article from the source material below.
 
 ABSOLUTE RULES:
-1. Use ONLY facts explicitly stated in the Title and Summary. NEVER invent names, dates, numbers, statistics, quotes, locations, or events that are not in the source text.
-2. You MAY add one short paragraph of general, well-known background context (for example what a mentioned competition or institution is), but it must stay generic — no specific claims.
-3. If the summary is very short, write a concise 2-3 paragraph piece strictly from what is given. Do NOT pad with invented details.
+1. Use ONLY facts explicitly stated in the sources below. NEVER invent names, dates, numbers, statistics, quotes, locations, or events.
+2. When multiple sources are given, SYNTHESIZE them into one coherent article: combine complementary facts, note where sources agree. Do not copy any source verbatim.
+3. You MAY add one short paragraph of general, well-known background context, but it must stay generic — no specific claims.
 4. Write in ${langName}. Clear, objective, professional news tone. Inverted pyramid: the most important fact first.
-5. Structure for readers and search engines: short paragraphs, one idea each, no repetition.
-6. Output ONLY HTML paragraphs: <p>...</p>. No headings, no markdown, no lists, no preamble or explanation.
-7. Length: 120-220 words.
+5. Structure for readers and search engines: short paragraphs, one idea each, smooth transitions, no repetition.
+6. Output ONLY HTML paragraphs: <p>...</p>. No headings, no markdown, no lists, no preamble.
+7. Length: ${isMulti ? "250-400 words — this is a major trending story, write a comprehensive piece" : "120-220 words"}.
 
-Title: ${article.title}
-Summary: ${article.summary}
-Source: ${article.source_name}
+${sourceTexts}
 Category: ${article.category}`;
 }
 
+/** Normalize a headline for grouping the same story across sources. */
+function normalizeTitleJs(title) {
+  return (title || "")
+    .toLowerCase()
+    .replace(/[\p{P}\p{S}\p{Z}\s_،؛؟！…"“”'']/gu, "")
+    .replace(/[ً-ٰٟ]/g, "");
+}
+
 /** Expand one article's summary into a professional body via Gemini. Returns HTML or null. */
-async function expandWithGemini(article, apiKey) {
+async function expandWithGemini(article, apiKey, extraSources = []) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(apiKey)}`;
+  const isMulti = extraSources.length > 0;
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      contents: [{ parts: [{ text: expansionPrompt(article) }] }],
-      generationConfig: { temperature: 0.7, maxOutputTokens: 900 },
+      contents: [{ parts: [{ text: expansionPrompt(article, extraSources) }] }],
+      generationConfig: { temperature: 0.7, maxOutputTokens: isMulti ? 1400 : 900 },
     }),
-    signal: AbortSignal.timeout(30_000),
+    signal: AbortSignal.timeout(60_000),
   });
   if (!res.ok) {
     const errText = await res.text().catch(() => "");
@@ -93,28 +107,40 @@ async function expandBodies(articles, apiKey) {
     console.log("GEMINI_API_KEY not set — skipping AI expansion.");
     return { generated: 0, failed: 0 };
   }
-  const queue = articles.filter((a) => !a.body);
+  // Group the same story across outlets: trending stories get a synthesized,
+  // comprehensive article from all sources' material.
+  const groups = new Map();
+  for (const a of articles) {
+    if (a.body) continue;
+    const key = `${a.lang}:${normalizeTitleJs(a.title)}`;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(a);
+  }
   let generated = 0,
     failed = 0;
-  for (const article of queue) {
-    try {
-      const body = await expandWithGemini(article, apiKey);
-      if (body) {
-        article.body = body;
-        article.body_generated_at = new Date().toISOString();
-        generated++;
-      } else {
+  for (const group of groups.values()) {
+    for (const article of group) {
+      const extraSources = group.filter((g) => g.id !== article.id);
+      try {
+        const body = await expandWithGemini(article, apiKey, extraSources);
+        if (body) {
+          article.body = body;
+          article.body_generated_at = new Date().toISOString();
+          generated++;
+        } else {
+          failed++;
+        }
+      } catch (e) {
+        console.log(`AI expansion failed for ${article.id}: ${e.message}`);
         failed++;
+        if (/429|quota|RESOURCE_EXHAUSTED/i.test(e.message)) {
+          console.log("Rate/quota hit — stopping AI expansion for this run.");
+          console.log(`AI expansion: ${generated} generated, ${failed} failed.`);
+          return { generated, failed };
+        }
       }
-    } catch (e) {
-      console.log(`AI expansion failed for ${article.id}: ${e.message}`);
-      failed++;
-      if (/429|quota|RESOURCE_EXHAUSTED/i.test(e.message)) {
-        console.log("Rate/quota hit — stopping AI expansion for this run.");
-        break;
-      }
+      await sleep(GEMINI_DELAY_MS);
     }
-    await sleep(GEMINI_DELAY_MS);
   }
   console.log(`AI expansion: ${generated} generated, ${failed} failed.`);
   return { generated, failed };
