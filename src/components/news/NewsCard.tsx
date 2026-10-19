@@ -50,8 +50,7 @@ export function NewsCard({ article, lang, variant = "standard", className }: Pro
         className="mb-4 block overflow-hidden bg-secondary"
       >
         <EditorialImage
-          src={article.image_url ?? categoryImage(article.category)}
-          fallbackSrc={categoryImage(article.category)}
+          src={categoryImage(article.category, article.id)}
           alt={article.title}
           width={isLead ? 1200 : 640}
           height={isLead ? 675 : 360}
@@ -91,8 +90,15 @@ export function NewsCard({ article, lang, variant = "standard", className }: Pro
       ) : null}
 
       <p className="mt-3 text-xs tabular-nums text-muted-foreground">
-        <span className="font-semibold text-foreground">{article.source_name}</span> ·{" "}
-        <time dateTime={article.published_at}>{formatDate(article.published_at, lang)}</time>
+        <a
+          href={article.source_url ?? article.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-semibold text-foreground hover:text-primary hover:underline"
+        >
+          {article.source_name}
+        </a>{" "}
+        · <time dateTime={article.published_at}>{formatDate(article.published_at, lang)}</time>
       </p>
     </article>
   );

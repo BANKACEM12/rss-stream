@@ -142,15 +142,22 @@ function ArticlePage() {
         </h1>
         <p className="mt-3 text-sm text-muted-foreground">
           {dict.source}:{" "}
-          <span className="font-semibold text-foreground">{article.source_name}</span> ·{" "}
+          <a
+            href={article.source_url ?? article.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-foreground hover:text-primary hover:underline"
+          >
+            {article.source_name}
+          </a>{" "}
+          ·{" "}
           {dict.publishedAt} <time dateTime={article.published_at}>{formatDate(article.published_at, lang)}</time>
         </p>
 
         <ShareButtons lang={lang} slug={article.slug} title={article.title} className="mt-4" />
 
         <EditorialImage
-          src={article.image_url ?? categoryImage(article.category)}
-          fallbackSrc={categoryImage(article.category)}
+          src={categoryImage(article.category, article.id)}
           alt={article.title}
           width={1200}
           height={675}

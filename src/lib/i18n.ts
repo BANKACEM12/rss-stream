@@ -137,7 +137,7 @@ export const DICT: Record<Lang, Dict> = {
         body: [
           "لا نطلب تسجيل حساب لقراءة الأخبار، ولا نجمع بيانات شخصية غير ضرورية.",
           "نستخدم إحصائيات زيارات مجهولة الهوية لفهم الصفحات الأكثر قراءة.",
-          "قد يعرض شركاء الإعلان لدينا إعلانات تعتمد على ملفات تعريف الارتباط، ويمكنك تعطيلها من إعدادات متصفحك.",
+          "نستخدم Google AdSense لعرض الإعلانات. تستخدم Google ملفات تعريف الارتباط لعرض إعلانات مخصصة بناءً على زياراتك السابقة لهذا الموقع ومواقع أخرى، ويمكنك تعطيل الإعلانات المخصصة من إعدادات إعلانات Google.",
           "لا نبيع بياناتك لأي طرف ثالث.",
         ],
       },
@@ -238,7 +238,7 @@ export const DICT: Record<Lang, Dict> = {
         body: [
           "No account is needed to read the news and we do not collect unnecessary personal data.",
           "We use anonymous traffic statistics to understand which pages are read most.",
-          "Advertising partners may use cookies; you can disable them in your browser settings.",
+          "We use Google AdSense to serve ads. Google uses cookies to serve personalized ads based on your prior visits to this and other sites; you can opt out of personalized advertising in Google Ads Settings.",
           "We never sell your data to third parties.",
         ],
       },
@@ -339,7 +339,7 @@ export const DICT: Record<Lang, Dict> = {
         body: [
           "阅读新闻无需注册账号，我们不收集不必要的个人信息。",
           "我们使用匿名访问统计来了解哪些页面阅读量最高。",
-          "广告合作方可能使用 Cookie，您可在浏览器设置中关闭。",
+          "我们使用 Google AdSense 展示广告。Google 会使用 Cookie，根据您此前对本网站及其他网站的访问投放个性化广告；您可以在 Google 广告设置中选择退出个性化广告。",
           "我们绝不向第三方出售您的数据。",
         ],
       },
