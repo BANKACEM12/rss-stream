@@ -1,10 +1,8 @@
 {
-  "generated_at": "2026-10-19T05:54:07.506Z",
-  "count": 541,
-  "added": 126,
-  "fetched": 400,
-  "feeds_ok": 29,
-  "feeds_failed": [
-    "RT عربي: HTTP 403"
-  ]
+  "generated_at": "2026-10-19T08:47:38.460Z",
+  "count": 609,
+  "added": 194,
+  "fetched": 430,
+  "feeds_ok": 30,
+  "feeds_failed": []
 }
