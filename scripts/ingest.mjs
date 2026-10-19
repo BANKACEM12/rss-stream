@@ -61,7 +61,7 @@ ABSOLUTE RULES:
 4. Write in ${langName}. Clear, objective, professional news tone. Inverted pyramid: the most important fact first.
 5. Structure for readers and search engines: short paragraphs, one idea each, smooth transitions, no repetition.
 6. Output ONLY HTML paragraphs: <p>...</p>. No headings, no markdown, no lists, no preamble.
-7. Length: ${isMulti ? "250-400 words — this is a major trending story, write a comprehensive piece" : "120-220 words"}.
+7. Length: ${isMulti ? "500-800 words — this is a major trending story, write a full comprehensive article with rich detail from all sources" : "200-350 words — write a complete professional article, well-developed"}.
 
 ${sourceTexts}
 Category: ${article.category}`;
@@ -84,7 +84,7 @@ async function expandWithGemini(article, apiKey, extraSources = []) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       contents: [{ parts: [{ text: expansionPrompt(article, extraSources) }] }],
-      generationConfig: { temperature: 0.7, maxOutputTokens: isMulti ? 1400 : 900 },
+      generationConfig: { temperature: 0.7, maxOutputTokens: isMulti ? 2200 : 1200 },
     }),
     signal: AbortSignal.timeout(60_000),
   });
