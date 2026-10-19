@@ -353,7 +353,7 @@ async function runWithConcurrency(items, limit, fn) {
 
 function buildArticle(feed, item) {
   const guid = `${feed.lang}:${hash(item.guid || item.link)}`;
-  const summary = excerpt(item.description || item.title, 200);
+  const summary = excerpt(item.description || item.title, 400);
   return {
     id: guid,
     guid,

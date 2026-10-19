@@ -135,7 +135,7 @@ function ArticlePage() {
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
-      <article>
+      <article key={article.id}>
         <p className="kicker">{dict.categories[article.category as Category] ?? article.category}</p>
         <h1 className="mt-2 font-display text-2xl font-black leading-tight md:text-4xl">
           {article.title}

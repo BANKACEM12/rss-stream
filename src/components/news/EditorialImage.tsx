@@ -1,4 +1,4 @@
-import { useState, type SyntheticEvent } from "react";
+import { useEffect, useState, type SyntheticEvent } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -42,6 +42,13 @@ export function EditorialImage({
 }: Props) {
   const [hidden, setHidden] = useState(false);
   const [currentSrc, setCurrentSrc] = useState(() => highResolutionUrl(src));
+
+  // Resync when navigating between articles (same component instance, new src).
+  useEffect(() => {
+    setHidden(false);
+    setCurrentSrc(highResolutionUrl(src));
+  }, [src]);
+
   if (hidden) return null;
 
   const useFallback = () => {
