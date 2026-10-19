@@ -39,6 +39,8 @@ type Dict = {
   latest: string;
   breaking: string;
   readOriginal: string;
+  keyPoints: string;
+  otherCoverage: string;
   related: string;
   source: string;
   publishedAt: string;
@@ -78,6 +80,8 @@ export const DICT: Record<Lang, Dict> = {
     latest: "أحدث الأخبار",
     breaking: "عاجل",
     readOriginal: "اقرأ الخبر من المصدر ↗",
+    keyPoints: "أبرز النقاط",
+    otherCoverage: "تغطيات أخرى لنفس الخبر",
     related: "أخبار ذات صلة",
     source: "المصدر",
     publishedAt: "نُشر في",
@@ -180,6 +184,8 @@ export const DICT: Record<Lang, Dict> = {
     latest: "Latest headlines",
     breaking: "Breaking",
     readOriginal: "Read original source ↗",
+    keyPoints: "Key points",
+    otherCoverage: "Other coverage of this story",
     related: "Related stories",
     source: "Source",
     publishedAt: "Published",
@@ -282,6 +288,8 @@ export const DICT: Record<Lang, Dict> = {
     latest: "最新头条",
     breaking: "快讯",
     readOriginal: "阅读原文 ↗",
+    keyPoints: "要点",
+    otherCoverage: "其他媒体的相关报道",
     related: "相关报道",
     source: "来源",
     publishedAt: "发布于",

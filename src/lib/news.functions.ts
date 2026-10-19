@@ -83,14 +83,24 @@ async function getHot(): Promise<Article[]> {
   return isArticleArray(data) ? dedupeByTitle(data) : FALLBACK;
 }
 
+/** Normalize a headline for duplicate detection. */
+function normalizeTitle(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[\p{P}\p{S}\p{Z}\s_،؛؟！…"“”'']/gu, "")
+    .replace(/[ً-ٰٟ]/g, "");
+}
+
+async function getHotRaw(): Promise<Article[]> {
+  const data = await fetchJson(HOT_URL, HOT_TTL_MS);
+  return isArticleArray(data) ? data : FALLBACK;
+}
+
 /** Drop near-duplicate stories (same headline republished by another feed). */
 function dedupeByTitle(rows: Article[]): Article[] {
   const seen = new Set<string>();
   return rows.filter((a) => {
-    const key = a.title
-      .toLowerCase()
-      .replace(/[\p{P}\p{S}\p{Z}\s_،؛؟！…"“”'']/gu, "")
-      .replace(/[ً-ٰٟ]/g, "");
+    const key = normalizeTitle(a.title);
     if (!key || seen.has(key)) return !key ? true : false;
     seen.add(key);
     return true;
@@ -166,7 +176,22 @@ export const getArticle = createServerFn({ method: "GET" })
       ),
     ).slice(0, 6);
 
-    return { article, related };
+    // Other outlets covering the same story (same normalized headline,
+    // different source) — legitimate aggregation depth, fully attributed.
+    const rawHot = await getHotRaw();
+    const articleKey = normalizeTitle(article.title);
+    const coverage = articleKey
+      ? byNewest(
+          rawHot.filter(
+            (a) =>
+              a.id !== article.id &&
+              a.lang === article.lang &&
+              normalizeTitle(a.title) === articleKey,
+          ),
+        ).slice(0, 3)
+      : [];
+
+    return { article, related, coverage };
   });
 
 export const listSitemapEntries = createServerFn({ method: "GET" }).handler(async () => {

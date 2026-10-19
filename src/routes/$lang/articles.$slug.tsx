@@ -20,6 +20,16 @@ const articleQuery = (lang: Lang, slug: string) =>
 const safeLang = (value: string) =>
   ((LANGS as readonly string[]).includes(value) ? value : "ar") as Lang;
 
+/** Split a summary into key-point sentences (shown as a structured box). */
+function extractKeyPoints(summary: string): string[] {
+  const sentences = summary
+    .split(/(?<=[.!?؟。！…])\s+/)
+    .map((s) => s.trim())
+    .filter((s) => s.length > 25);
+  if (sentences.length < 3) return [];
+  return sentences.slice(0, 4);
+}
+
 export const Route = createFileRoute("/$lang/articles/$slug")({
   loader: async ({ context, params }) => {
     const data = await context.queryClient.ensureQueryData(
@@ -130,7 +140,8 @@ function ArticlePage() {
   const dict = DICT[lang];
   const { data } = useSuspenseQuery(articleQuery(lang, params.slug));
   if (!data) return null;
-  const { article, related } = data;
+  const { article, related, coverage } = data;
+  const keyPoints = extractKeyPoints(article.summary ?? "");
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
@@ -167,6 +178,20 @@ function ArticlePage() {
 
         <p className="drop-cap mt-6 text-lg leading-relaxed">{article.summary}</p>
 
+        {keyPoints.length ? (
+          <section className="mt-6 border border-border bg-card p-5">
+            <h2 className="kicker">{dict.keyPoints}</h2>
+            <ul className="mt-3 space-y-2.5">
+              {keyPoints.map((point) => (
+                <li key={point} className="flex gap-2.5 text-[15px] leading-relaxed">
+                  <span aria-hidden className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                  <span>{point}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
         {article.body ? (
           <div
             className="article-body mt-6 border-t border-border pt-2"
@@ -175,13 +200,41 @@ function ArticlePage() {
         ) : null}
 
         {/* Keep readers on the site first: related stories come before the exit link. */}
+        {coverage.length ? (
+          <section className="mt-8">
+            <h2 className="rule-double pt-3 font-display text-xl font-black">{dict.otherCoverage}</h2>
+            <div className="mt-4 space-y-4">
+              {coverage.map((item) => (
+                <article key={item.id} className="border border-border bg-card p-4">
+                  <p className="text-xs font-semibold text-primary">{item.source_name}</p>
+                  <h3 className="mt-1 font-display text-[17px] font-bold leading-snug">
+                    <a
+                      href={item.link}
+                      target="_blank"
+                      rel="nofollow noopener noreferrer"
+                      className="transition-colors hover:text-primary"
+                    >
+                      {item.title}
+                    </a>
+                  </h3>
+                  {item.summary ? (
+                    <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+                      {item.summary}
+                    </p>
+                  ) : null}
+                </article>
+              ))}
+            </div>
+          </section>
+        ) : null}
+
         <RelatedStories articles={related} lang={lang} />
 
         <a
           href={article.link}
           target="_blank"
           rel="nofollow noopener noreferrer"
-          className="mt-8 inline-block border border-border px-4 py-2.5 text-sm font-semibold text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+          className="mt-8 inline-block bg-primary px-6 py-3 text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90"
         >
           {dict.readOriginal}
         </a>
