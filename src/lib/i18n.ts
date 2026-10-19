@@ -42,6 +42,8 @@ type Dict = {
   related: string;
   source: string;
   publishedAt: string;
+  share: string;
+  copied: string;
   categories: Record<Category, string>;
   nav: { home: string; about: string; contact: string; editorial: string };
   footer: {
@@ -78,6 +80,8 @@ export const DICT: Record<Lang, Dict> = {
     related: "أخبار ذات صلة",
     source: "المصدر",
     publishedAt: "نُشر في",
+    share: "شارك",
+    copied: "تم النسخ!",
     categories: {
       world: "العالم",
       business: "اقتصاد",
@@ -177,6 +181,8 @@ export const DICT: Record<Lang, Dict> = {
     related: "Related stories",
     source: "Source",
     publishedAt: "Published",
+    share: "Share",
+    copied: "Copied!",
     categories: {
       world: "World",
       business: "Business",
@@ -276,6 +282,8 @@ export const DICT: Record<Lang, Dict> = {
     related: "相关报道",
     source: "来源",
     publishedAt: "发布于",
+    share: "分享",
+    copied: "已复制！",
     categories: {
       world: "国际",
       business: "财经",

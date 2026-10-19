@@ -9,6 +9,8 @@ type Props = {
   height: number;
   className?: string;
   eager?: boolean;
+  /** Shown when `src` fails to load (or is too small) instead of an empty box. */
+  fallbackSrc?: string;
 };
 
 function highResolutionUrl(src: string) {
@@ -26,18 +28,30 @@ function highResolutionUrl(src: string) {
   }
 }
 
-export function EditorialImage({ src, alt, width, height, className, eager = false }: Props) {
+export function EditorialImage({ src, alt, width, height, className, eager = false, fallbackSrc }: Props) {
   const [hidden, setHidden] = useState(false);
+  const [currentSrc, setCurrentSrc] = useState(() => highResolutionUrl(src));
   if (hidden) return null;
+
+  const useFallback = () => {
+    if (fallbackSrc) {
+      const fb = highResolutionUrl(fallbackSrc);
+      if (currentSrc !== fb) {
+        setCurrentSrc(fb);
+        return;
+      }
+    }
+    setHidden(true);
+  };
 
   const checkQuality = (event: SyntheticEvent<HTMLImageElement>) => {
     const image = event.currentTarget;
-    if (image.naturalWidth < 320 || image.naturalHeight < 180) setHidden(true);
+    if (image.naturalWidth < 320 || image.naturalHeight < 180) useFallback();
   };
 
   return (
     <img
-      src={highResolutionUrl(src)}
+      src={currentSrc}
       alt={alt}
       width={width}
       height={height}
@@ -45,7 +59,7 @@ export function EditorialImage({ src, alt, width, height, className, eager = fal
       fetchPriority={eager ? "high" : "auto"}
       decoding="async"
       onLoad={checkQuality}
-      onError={() => setHidden(true)}
+      onError={useFallback}
       className={cn("bg-secondary object-cover", className)}
     />
   );

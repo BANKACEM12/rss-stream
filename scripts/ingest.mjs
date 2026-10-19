@@ -79,18 +79,34 @@ const FEEDS = [
 /* ------------------------------------------------------------------ */
 
 function decodeEntities(input) {
-  return input
-    .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1")
+  // Decode entities FIRST (two passes catch double-encoded like &amp;quot;),
+  // THEN strip tags — otherwise &lt;p&gt; becomes a literal <p> in the text.
+  let text = input.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1");
+  for (let i = 0; i < 2; i++) {
+    const prev = text;
+    text = text
+      .replace(/&nbsp;/g, " ")
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;|&apos;/g, "'")
+      .replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number(code)));
+    if (text === prev) break;
+  }
+  return text
     .replace(/<[^>]+>/g, " ")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;|&apos;/g, "'")
-    .replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number(code)))
     .replace(/\s+/g, " ")
     .trim();
+}
+
+/**
+ * One-time cleanup for articles stored before the decode fix:
+ * repairs leftover entities and truncated entity tails (e.g. "&q").
+ */
+function cleanLegacyText(input) {
+  if (!input) return input;
+  return decodeEntities(input).replace(/&[a-zA-Z]*$/, "").trim();
 }
 
 function tag(block, names) {
@@ -334,11 +350,27 @@ async function main() {
 
   // Migration: make sure every existing hot article is archived + indexed.
   // (One-time for data created before the archive existed.)
+  // Also repairs text stored before the entity-decode fix.
   let migrated = 0;
+  const needsClean = (t) => /&[a-zA-Z#]+;?/.test(t || "") || /<[a-zA-Z/][^>]*>/.test(t || "");
   for (const article of hot) {
+    if (needsClean(article.title) || needsClean(article.summary)) {
+      article.title = cleanLegacyText(article.title);
+      article.summary = cleanLegacyText(article.summary);
+    }
     if (archiveArticle(article, index)) migrated++;
     else if (!index[article.slug]) {
       index[article.slug] = monthKey(article.published_at);
+    }
+  }
+  // Repair archived shards too (only rewrites shards that changed).
+  for (const [month, shard] of shardCache) {
+    for (const article of shard.rows) {
+      if (needsClean(article.title) || needsClean(article.summary)) {
+        article.title = cleanLegacyText(article.title);
+        article.summary = cleanLegacyText(article.summary);
+        shard.dirty = true;
+      }
     }
   }
 

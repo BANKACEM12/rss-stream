@@ -51,6 +51,7 @@ export function NewsCard({ article, lang, variant = "standard", className }: Pro
       >
         <EditorialImage
           src={article.image_url ?? categoryImage(article.category)}
+          fallbackSrc={categoryImage(article.category)}
           alt={article.title}
           width={isLead ? 1200 : 640}
           height={isLead ? 675 : 360}

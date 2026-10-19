@@ -69,6 +69,9 @@ function HomePage() {
 
   return (
     <div>
+      <h1 className="sr-only">
+        {dict.siteName} — {dict.tagline}
+      </h1>
       <form
         role="search"
         onSubmit={(event) => event.preventDefault()}

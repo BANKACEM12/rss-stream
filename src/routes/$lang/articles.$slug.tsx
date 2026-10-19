@@ -5,6 +5,7 @@ import { AdSlot } from "@/components/news/AdSlot";
 import { EditorialImage } from "@/components/news/EditorialImage";
 import { GlobalScoreBox } from "@/components/news/GlobalScoreBox";
 import { RelatedStories } from "@/components/news/RelatedStories";
+import { ShareButtons } from "@/components/news/ShareButtons";
 import { categoryImage } from "@/lib/category-images";
 import { getArticle } from "@/lib/news.functions";
 import { absUrl } from "@/lib/seo";
@@ -145,8 +146,11 @@ function ArticlePage() {
           {dict.publishedAt} <time dateTime={article.published_at}>{formatDate(article.published_at, lang)}</time>
         </p>
 
+        <ShareButtons lang={lang} slug={article.slug} title={article.title} className="mt-4" />
+
         <EditorialImage
           src={article.image_url ?? categoryImage(article.category)}
+          fallbackSrc={categoryImage(article.category)}
           alt={article.title}
           width={1200}
           height={675}
