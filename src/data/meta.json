@@ -1,12 +1,14 @@
 {
-  "generated_at": "2026-10-21T15:48:28.352Z",
-  "hot_count": 2553,
-  "archived_total": 2553,
-  "index_size": 2553,
-  "added": 182,
+  "generated_at": "2026-10-21T20:08:37.099Z",
+  "hot_count": 2671,
+  "archived_total": 2671,
+  "index_size": 2671,
+  "added": 118,
   "migrated": 0,
-  "fetched": 415,
+  "fetched": 400,
   "shards_written": 1,
-  "feeds_ok": 30,
-  "feeds_failed": []
+  "feeds_ok": 29,
+  "feeds_failed": [
+    "Solidot: fetch failed"
+  ]
 }
