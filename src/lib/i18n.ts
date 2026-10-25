@@ -43,6 +43,7 @@ type Dict = {
   otherCoverage: string;
   related: string;
   source: string;
+  editorialBadge: string;
   publishedAt: string;
   share: string;
   copied: string;
@@ -84,6 +85,7 @@ export const DICT: Record<Lang, Dict> = {
     otherCoverage: "تغطيات أخرى لنفس الخبر",
     related: "أخبار ذات صلة",
     source: "المصدر",
+    editorialBadge: "تحرير أصلي",
     publishedAt: "نُشر في",
     share: "شارك",
     copied: "تم النسخ!",
@@ -164,7 +166,7 @@ export const DICT: Record<Lang, Dict> = {
           "نجمع الأخبار تلقائياً من خدمات RSS العامة التي تنشرها المؤسسات الإخبارية بنفسها.",
           "نعرض العنوان ومقتطفاً لا يتجاوز 200 حرف، مع رابط واضح للخبر الكامل عند المصدر.",
           "كل الروابط الخارجية تحمل خاصية nofollow احتراماً لحقوق المصادر.",
-          "لا نستخدم الذكاء الاصطناعي لتوليد أو إعادة كتابة الأخبار.",
+          "المقالات الموسومة «تحرير أصلي» يكتبها فريق التحرير من حقائق موثّقة، وقد يُستعان فيها بأدوات ذكاء اصطناعي للصياغة مع مراجعة بشرية، والمصادر مذكورة في كل مقال.",
           "تواريخ النشر المعروضة هي التواريخ الحقيقية من المصدر، لا تاريخ الجلب.",
           "لطلب إزالة أي مصدر أو خبر، راسلنا من صفحة الاتصال وسنستجيب فوراً.",
         ],
@@ -188,6 +190,7 @@ export const DICT: Record<Lang, Dict> = {
     otherCoverage: "Other coverage of this story",
     related: "Related stories",
     source: "Source",
+    editorialBadge: "Original Editorial",
     publishedAt: "Published",
     share: "Share",
     copied: "Copied!",
@@ -268,7 +271,7 @@ export const DICT: Record<Lang, Dict> = {
           "Stories are collected automatically from public RSS feeds published by newsrooms themselves.",
           "We display the headline and an excerpt of at most 200 characters, with a clear link to the full story at the source.",
           "All outbound links use rel=nofollow out of respect for the sources.",
-          "We do not use AI to generate or rewrite news content.",
+          "Articles labelled 'Original Editorial' are written by our editors from verified facts; AI tools may assist drafting under human review, and sources are cited in each article.",
           "Publication dates shown are the real source dates, not our fetch time.",
           "To request removal of a source or story, write to us from the contact page.",
         ],
@@ -292,6 +295,7 @@ export const DICT: Record<Lang, Dict> = {
     otherCoverage: "其他媒体的相关报道",
     related: "相关报道",
     source: "来源",
+    editorialBadge: "原创编辑",
     publishedAt: "发布于",
     share: "分享",
     copied: "已复制！",
@@ -372,7 +376,7 @@ export const DICT: Record<Lang, Dict> = {
           "内容自动来自新闻机构自行发布的公开 RSS 订阅源。",
           "我们展示标题与不超过 200 字符的摘要，并提供指向来源全文的清晰链接。",
           "所有外部链接均带 nofollow 属性，以尊重来源权益。",
-          "我们不使用人工智能生成或改写新闻内容。",
+          "标注为“原创编辑”的文章由编辑团队根据核实事实撰写，起草时可能在人工审核下使用人工智能工具辅助，每篇文章均注明来源。",
           "显示的发布时间为来源的真实时间，而非抓取时间。",
           "如需移除某个来源或内容，请通过联系页面告知我们。",
         ],

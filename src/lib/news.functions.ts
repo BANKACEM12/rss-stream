@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { CATEGORIES, LANGS } from "./i18n";
 import articlesJson from "../data/articles.json";
+import editorialJson from "../data/editorial.json";
 
 export type Article = {
   id: string;
@@ -20,6 +21,7 @@ export type Article = {
   published_at: string;
   body: string | null;
   body_generated_at: string | null;
+  isEditorial?: boolean;
 };
 
 /**
@@ -37,6 +39,7 @@ export type Article = {
  */
 const RAW_BASE = "https://raw.githubusercontent.com/BANKACEM12/rss-stream/main/src/data";
 const HOT_URL = `${RAW_BASE}/articles.json`;
+const EDITORIAL_URL = `${RAW_BASE}/editorial.json`;
 const INDEX_URL = `${RAW_BASE}/archive-index.json`;
 const shardUrl = (month: string) => `${RAW_BASE}/archive/${month}.json`;
 
@@ -78,9 +81,25 @@ function isArticleArray(value: unknown): value is Article[] {
   );
 }
 
+/** Original editorial articles (src/data/editorial.json). They are merged at
+ *  read time and never touched by the ingestion workflow, so a fresh ingest
+ *  can never overwrite or delete them. Bundled copy is the offline fallback. */
+const EDITORIAL_FALLBACK = editorialJson as Article[];
+
+async function getEditorial(): Promise<Article[]> {
+  const data = await fetchJson(EDITORIAL_URL, HOT_TTL_MS);
+  return isArticleArray(data) ? data : EDITORIAL_FALLBACK;
+}
+
+function mergeEditorial(hot: Article[], editorial: Article[]): Article[] {
+  const seen = new Set(hot.map((a) => a.slug));
+  return [...hot, ...editorial.filter((a) => !seen.has(a.slug))];
+}
+
 async function getHot(): Promise<Article[]> {
   const data = await fetchJson(HOT_URL, HOT_TTL_MS);
-  return isArticleArray(data) ? dedupeByTitle(data) : FALLBACK;
+  const hot = isArticleArray(data) ? dedupeByTitle(data) : FALLBACK;
+  return mergeEditorial(hot, await getEditorial());
 }
 
 /** Normalize a headline for duplicate detection. */
@@ -93,7 +112,8 @@ function normalizeTitle(title: string): string {
 
 async function getHotRaw(): Promise<Article[]> {
   const data = await fetchJson(HOT_URL, HOT_TTL_MS);
-  return isArticleArray(data) ? data : FALLBACK;
+  const hot = isArticleArray(data) ? data : FALLBACK;
+  return mergeEditorial(hot, await getEditorial());
 }
 
 /** Drop near-duplicate stories (same headline republished by another feed). */

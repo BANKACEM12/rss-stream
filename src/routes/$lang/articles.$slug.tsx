@@ -97,9 +97,12 @@ export const Route = createFileRoute("/$lang/articles/$slug")({
             datePublished: article.published_at,
             inLanguage: lang,
             ...(article.image_url ? { image: [article.image_url] } : {}),
-            isBasedOn: article.link,
+            ...(article.isEditorial ? {} : { isBasedOn: article.link }),
             publisher: { "@type": "Organization", name: article.source_name },
-            author: { "@type": "Organization", name: article.source_name },
+            author: {
+              "@type": "Organization",
+              name: article.isEditorial ? "فريق تحرير نبض الأخبار" : article.source_name,
+            },
             dateModified: article.published_at,
             articleSection: dict.categories[article.category as Category] ?? article.category,
             ...(article.keywords?.length ? { keywords: article.keywords.join(", ") } : {}),
@@ -147,19 +150,28 @@ function ArticlePage() {
     <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
       <article key={article.id}>
         <p className="kicker">{dict.categories[article.category as Category] ?? article.category}</p>
+        {article.isEditorial ? (
+          <p className="mt-2 inline-block bg-primary px-2 py-1 text-xs font-bold text-primary-foreground">
+            {dict.editorialBadge}
+          </p>
+        ) : null}
         <h1 className="mt-2 font-display text-2xl font-black leading-tight md:text-4xl">
           {article.title}
         </h1>
         <p className="mt-3 text-sm text-muted-foreground">
           {dict.source}:{" "}
-          <a
-            href={article.source_url ?? article.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-semibold text-foreground hover:text-primary hover:underline"
-          >
-            {article.source_name}
-          </a>{" "}
+          {article.isEditorial ? (
+            <span className="font-semibold text-foreground">{article.source_name}</span>
+          ) : (
+            <a
+              href={article.source_url ?? article.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-foreground hover:text-primary hover:underline"
+            >
+              {article.source_name}
+            </a>
+          )}{" "}
           ·{" "}
           {dict.publishedAt} <time dateTime={article.published_at}>{formatDate(article.published_at, lang)}</time>
         </p>
@@ -230,14 +242,16 @@ function ArticlePage() {
 
         <RelatedStories articles={related} lang={lang} />
 
-        <a
-          href={article.link}
-          target="_blank"
-          rel="nofollow noopener noreferrer"
-          className="mt-8 inline-block bg-primary px-6 py-3 text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90"
-        >
-          {dict.readOriginal}
-        </a>
+        {article.isEditorial ? null : (
+          <a
+            href={article.link}
+            target="_blank"
+            rel="nofollow noopener noreferrer"
+            className="mt-8 inline-block bg-primary px-6 py-3 text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90"
+          >
+            {dict.readOriginal}
+          </a>
+        )}
 
         <p className="mt-4 border-s-2 border-border ps-3 text-xs text-muted-foreground">
           {dict.footer.disclaimer}
