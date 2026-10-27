@@ -1,14 +1,12 @@
 {
-  "generated_at": "2026-10-27T15:09:36.612Z",
+  "generated_at": "2026-10-27T20:09:18.693Z",
   "hot_count": 4000,
-  "archived_total": 6760,
-  "index_size": 6760,
-  "added": 216,
+  "archived_total": 6899,
+  "index_size": 6899,
+  "added": 139,
   "migrated": 0,
-  "fetched": 405,
+  "fetched": 414,
   "shards_written": 1,
-  "feeds_ok": 29,
-  "feeds_failed": [
-    "البوابة العربية للتقنية: The operation was aborted due to timeout"
-  ]
+  "feeds_ok": 30,
+  "feeds_failed": []
 }
