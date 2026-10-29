@@ -1,12 +1,14 @@
 {
-  "generated_at": "2026-10-29T15:45:25.373Z",
+  "generated_at": "2026-10-29T20:43:19.185Z",
   "hot_count": 4000,
-  "archived_total": 8118,
-  "index_size": 8118,
-  "added": 203,
+  "archived_total": 8260,
+  "index_size": 8260,
+  "added": 142,
   "migrated": 0,
-  "fetched": 415,
+  "fetched": 400,
   "shards_written": 1,
-  "feeds_ok": 30,
-  "feeds_failed": []
+  "feeds_ok": 29,
+  "feeds_failed": [
+    "IT之家: The operation was aborted due to timeout"
+  ]
 }
