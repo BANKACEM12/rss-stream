@@ -1,16 +1,14 @@
 {
-  "generated_at": "2026-11-04T16:20:40.337Z",
+  "generated_at": "2026-11-04T22:16:45.064Z",
   "hot_count": 4000,
-  "archived_total": 11715,
-  "index_size": 11712,
-  "added": 200,
+  "archived_total": 11844,
+  "index_size": 11841,
+  "added": 129,
   "migrated": 0,
-  "fetched": 374,
+  "fetched": 405,
   "shards_written": 2,
-  "feeds_ok": 27,
+  "feeds_ok": 29,
   "feeds_failed": [
-    "فرانس 24: HTTP 403",
-    "فرانس 24: HTTP 403",
     "البوابة العربية للتقنية: HTTP 403"
   ]
 }
