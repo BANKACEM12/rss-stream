@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-11-08T16:28:31.800Z",
+  "generated_at": "2026-11-08T20:50:54.183Z",
   "hot_count": 4000,
-  "archived_total": 14063,
-  "index_size": 14060,
-  "added": 167,
+  "archived_total": 14153,
+  "index_size": 14150,
+  "added": 90,
   "migrated": 0,
   "fetched": 415,
   "shards_written": 1,
