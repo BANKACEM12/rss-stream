@@ -41,7 +41,8 @@ function getLinkWords(article) {
 }
 
 function identity(article, index) {
-  return String(article.guid || article.id || `${article.lang}:${article.link || article.title}:${index}`);
+  const stableId = article.guid || article.id || `${article.title}:${index}`;
+  return `${article.lang ?? ""}:${stableId}:${article.link ?? ""}`;
 }
 
 function dateSlug(article) {
@@ -133,31 +134,33 @@ export function reindexArticleSlugs(articles, previousAliases = {}) {
   const canonicalByOldSlug = new Map();
   for (const row of rows) {
     const key = identity(row.article, row.index);
-    const slug = slugByIdentity.get(key) ?? slugifyHeadline(row.article.title) || "news-article";
-    if (row.oldSlug) canonicalByOldSlug.set(row.oldSlug, slug);
+    const slug = slugByIdentity.get(key) ?? (slugifyHeadline(row.article.title) || "news-article");
+    if (row.oldSlug) canonicalByOldSlug.set(`${row.article.lang ?? ""}/${row.oldSlug}`, slug);
     row.article.slug = slug;
   }
 
   const aliases = {};
-  const resolve = (slug) => {
-    let value = slug;
+  const resolve = (scopedSlug) => {
+    let value = scopedSlug;
     const visited = new Set();
     while (value && !visited.has(value)) {
       visited.add(value);
       const next = canonicalByOldSlug.get(value) ?? previousAliases[value];
       if (!next || next === value) break;
-      value = next;
+      const lang = value.slice(0, value.indexOf("/"));
+      value = next.includes("/") ? next : `${lang}/${next}`;
     }
-    return value;
+    return value.slice(value.indexOf("/") + 1);
   };
 
-  for (const [oldSlug, target] of Object.entries(previousAliases)) {
-    const canonical = resolve(target);
-    if (oldSlug !== canonical) aliases[oldSlug] = canonical;
+  for (const [oldKey, target] of Object.entries(previousAliases)) {
+    const lang = oldKey.slice(0, oldKey.indexOf("/"));
+    const canonical = resolve(target.includes("/") ? target : `${lang}/${target}`);
+    if (oldKey !== `${lang}/${canonical}`) aliases[oldKey] = canonical;
   }
   for (const row of rows) {
     if (row.oldSlug && row.oldSlug !== row.article.slug) {
-      aliases[row.oldSlug] = row.article.slug;
+      aliases[`${row.article.lang ?? ""}/${row.oldSlug}`] = row.article.slug;
     }
   }
 
