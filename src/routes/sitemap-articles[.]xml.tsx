@@ -8,7 +8,7 @@ export const Route = createFileRoute("/sitemap-articles.xml")({
   server: {
     handlers: {
       GET: async ({ request }) => {
-        const base = siteOrigin(request);
+        const base = siteOrigin();
 
         const rows = (await listSitemapEntries()).filter((row) =>
           (LANGS as readonly string[]).includes(row.lang),

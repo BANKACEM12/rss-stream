@@ -10,7 +10,7 @@ export const Route = createFileRoute("/sitemap-news.xml")({
   server: {
     handlers: {
       GET: async ({ request }) => {
-        const base = siteOrigin(request);
+        const base = siteOrigin();
         const since = Date.now() - 48 * 3600 * 1000;
 
         const rows = (await listSitemapEntries()).filter(

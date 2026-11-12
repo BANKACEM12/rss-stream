@@ -9,8 +9,7 @@ export const Route = createFileRoute("/sitemap-pages.xml")({
   server: {
     handlers: {
       GET: async ({ request }) => {
-        const base = siteOrigin(request);
-        const now = new Date().toISOString();
+        const base = siteOrigin();
 
         const entries: string[] = [];
         const push = (path: string, priority: string, freq: string) => {
@@ -22,7 +21,6 @@ export const Route = createFileRoute("/sitemap-pages.xml")({
             entries.push(
               `  <url>
     <loc>${locUrl(base, `/${lang}${path}`)}</loc>
-    <lastmod>${now}</lastmod>
     <changefreq>${freq}</changefreq>
     <priority>${priority}</priority>
 ${alternates}

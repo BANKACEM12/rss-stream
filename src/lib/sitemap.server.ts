@@ -1,12 +1,8 @@
 /** Shared helpers for the XML sitemaps (server-only). */
+import { SITE_URL } from "@/lib/seo";
 
-export function siteOrigin(request: Request) {
-  const url = new URL(request.url);
-  const forwarded =
-    url.hostname === "localhost" || url.hostname === "127.0.0.1"
-      ? request.headers.get("x-forwarded-host")
-      : null;
-  return forwarded ? `https://${forwarded}` : url.origin;
+export function siteOrigin() {
+  return SITE_URL;
 }
 
 export function xmlEscape(value: string) {

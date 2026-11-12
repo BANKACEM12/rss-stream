@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+Sitemap URLs must use the configured public site origin, never the incoming request host, so preview domains are not exposed to search engines.
