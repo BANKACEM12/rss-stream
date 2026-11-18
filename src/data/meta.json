@@ -1,12 +1,14 @@
 {
-  "generated_at": "2026-11-17T21:54:47.280Z",
+  "generated_at": "2026-11-18T03:43:30.608Z",
   "hot_count": 4000,
-  "archived_total": 19260,
-  "index_size": 19257,
-  "added": 206,
+  "archived_total": 19440,
+  "index_size": 19438,
+  "added": 180,
   "migrated": 0,
-  "fetched": 415,
+  "fetched": 420,
   "shards_written": 1,
-  "feeds_ok": 30,
-  "feeds_failed": []
+  "feeds_ok": 29,
+  "feeds_failed": [
+    "البوابة العربية للتقنية: HTTP 415"
+  ]
 }
