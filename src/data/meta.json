@@ -1,14 +1,15 @@
 {
-  "generated_at": "2026-11-19T02:38:14.039Z",
+  "generated_at": "2026-11-19T10:55:58.804Z",
   "hot_count": 4000,
-  "archived_total": 20023,
-  "index_size": 20021,
-  "added": 161,
+  "archived_total": 20209,
+  "index_size": 20207,
+  "added": 186,
   "migrated": 0,
   "fetched": 404,
   "shards_written": 1,
-  "feeds_ok": 29,
+  "feeds_ok": 28,
   "feeds_failed": [
-    "البوابة العربية للتقنية: HTTP 415"
+    "البوابة العربية للتقنية: HTTP 415",
+    "اندبندنت عربية: HTTP 403"
   ]
 }
