@@ -1,15 +1,12 @@
 {
-  "generated_at": "2026-11-19T10:55:58.804Z",
+  "generated_at": "2026-11-19T19:44:50.237Z",
   "hot_count": 4000,
-  "archived_total": 20209,
-  "index_size": 20207,
-  "added": 186,
+  "archived_total": 20443,
+  "index_size": 20439,
+  "added": 234,
   "migrated": 0,
-  "fetched": 404,
+  "fetched": 414,
   "shards_written": 1,
-  "feeds_ok": 28,
-  "feeds_failed": [
-    "البوابة العربية للتقنية: HTTP 415",
-    "اندبندنت عربية: HTTP 403"
-  ]
+  "feeds_ok": 30,
+  "feeds_failed": []
 }
