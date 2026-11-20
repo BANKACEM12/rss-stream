@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-11-20T09:14:19.925Z",
+  "generated_at": "2026-11-20T18:03:23.599Z",
   "hot_count": 4000,
-  "archived_total": 20768,
-  "index_size": 20765,
-  "added": 176,
+  "archived_total": 20999,
+  "index_size": 20995,
+  "added": 231,
   "migrated": 0,
-  "fetched": 415,
+  "fetched": 430,
   "shards_written": 1,
   "feeds_ok": 30,
   "feeds_failed": []
