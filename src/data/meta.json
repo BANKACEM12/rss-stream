@@ -1,14 +1,12 @@
 {
-  "generated_at": "2026-11-21T00:02:28.693Z",
+  "generated_at": "2026-11-21T06:33:58.003Z",
   "hot_count": 4000,
-  "archived_total": 21145,
-  "index_size": 21141,
-  "added": 146,
+  "archived_total": 21264,
+  "index_size": 21260,
+  "added": 119,
   "migrated": 0,
   "fetched": 415,
   "shards_written": 1,
-  "feeds_ok": 29,
-  "feeds_failed": [
-    "اندبندنت عربية: HTTP 403"
-  ]
+  "feeds_ok": 30,
+  "feeds_failed": []
 }
