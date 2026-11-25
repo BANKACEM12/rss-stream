@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-11-25T15:08:46.473Z",
+  "generated_at": "2026-11-25T23:45:37.798Z",
   "hot_count": 4000,
-  "archived_total": 23455,
-  "index_size": 23448,
-  "added": 229,
+  "archived_total": 23633,
+  "index_size": 23626,
+  "added": 178,
   "migrated": 0,
-  "fetched": 415,
+  "fetched": 400,
   "shards_written": 1,
   "feeds_ok": 29,
   "feeds_failed": [
-    "Phys.org: fetch failed"
+    "Solidot: The operation was aborted due to timeout"
   ]
 }
