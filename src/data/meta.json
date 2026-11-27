@@ -1,12 +1,14 @@
 {
-  "generated_at": "2026-11-27T02:06:41.473Z",
+  "generated_at": "2026-11-27T10:55:21.514Z",
   "hot_count": 4000,
-  "archived_total": 24202,
-  "index_size": 24195,
-  "added": 158,
+  "archived_total": 24376,
+  "index_size": 24369,
+  "added": 174,
   "migrated": 0,
-  "fetched": 415,
+  "fetched": 400,
   "shards_written": 1,
-  "feeds_ok": 30,
-  "feeds_failed": []
+  "feeds_ok": 29,
+  "feeds_failed": [
+    "فرانس 24: HTTP 403"
+  ]
 }
